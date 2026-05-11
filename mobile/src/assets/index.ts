@@ -1,5 +1,1 @@
-import citi from './citi.svg';
-
-export {
-  citi,
-};
+// Aqui vocês vão colocar os imports dos ícones usados no projeto e exportarão
