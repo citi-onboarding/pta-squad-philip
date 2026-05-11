@@ -1,3 +1,1 @@
-import LogoCITi from "./Logo.png";
-
-export { LogoCITi };
+// Aqui vocês vão colocar os imports dos ícones usados no projeto e exportarão

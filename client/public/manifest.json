@@ -1,22 +1,11 @@
 {
-  "name": "Next.js Boilerplate",
-  "short_name": "Next.js Boilerplate",
-  "icons": [
-    {
-      "src": "/img/icon-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "/img/icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
+  "name": "Biblioteca Escolar",
+  "short_name": "Biblioteca",
+  "icons": [],
   "background_color": "#FFFFFF",
-  "description": "Next.js Boilerplate",
+  "description": "Sistema de Gestão de Biblioteca Escolar - CITi",
   "display": "fullscreen",
   "start_url": "/",
-  "theme_color": "#06092B",
-  "favicon": "/img/icon-192.png"
+  "theme_color": "#FFFFFF",
+  "favicon": "/favicon.ico"
 }

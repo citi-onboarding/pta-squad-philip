@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
+    "ignoreDeprecations": "6.0",
     "target": "es5",
     "lib": [
       "dom",
@@ -15,15 +16,12 @@
     "incremental": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "paths": {
       "@/*": ["./*"],
-      "@mui/styled-engine": [
-        "./node_modules/@mui/styled-engine-sc"
-      ],
       "@/components/*": ["./components/*"]
     },
     "plugins": [
