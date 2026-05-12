@@ -133,10 +133,6 @@ O projeto é um monorepo com três pastas principais:
 ```
    > Quando aparecer o campo **"Enter a name for the new migration:"**, digite uma frase curta descrevendo o que foi feito (ex: `add model livro`). Pense na migration como o commit do banco de dados — rode esse comando sempre que modificar o `schema.prisma`.
 
-6. Para iniciar o servidor em modo de desenvolvimento:
-```bash
-   pnpm dev
-```
 
 ---
 
