@@ -15,7 +15,8 @@ server/
 │   │   ├── index.ts                # Agrega todas as rotas
 │   │   ├── livro.routes.ts
 │   │   └── emprestimo.routes.ts
-│   ├── database.ts                 # Instância do Prisma Client — não mexa
+│   ├── database/
+│   │   └──index.ts                 # Instância do Prisma Client — não mexa
 │   └── server.ts                   # Entry point — não mexa
 └── prisma.config.ts                # Configuração do Prisma 7 — não mexa
 ```
