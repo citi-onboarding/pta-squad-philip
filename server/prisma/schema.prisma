@@ -7,3 +7,42 @@ datasource db {
   provider = "postgresql"
 }
 
+
+enum Categoria {
+  Romance
+  Infantil
+  Tecnologia
+  Historia
+  Ciencias
+}
+
+model Livro {
+  id String @id @default(uuid())
+  titulo String
+  autor String
+  isbn String
+  editora String
+  ano Int
+  quantidade_total Int
+  quantidade_disponivel Int
+  categoria Categoria
+  emprestimos Emprestimo[]
+}
+
+enum Status{
+  Em_andamento
+  Devolvido
+  Atrasado
+}
+
+model Emprestimo{
+  id String @id @default(uuid())
+  livro_id String
+  nome_cliente String
+  email_cliente String
+  data_locacao DateTime @default(now())
+  data_prevista_devolucao DateTime
+  status Status @default(Em_andamento)
+
+  livro Livro @relation(fields: [livro_id], references: [id])
+}

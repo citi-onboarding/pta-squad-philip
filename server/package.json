@@ -10,7 +10,7 @@
     "prod": "npm run migration:deploy && npm run start",
     "start": "npm run build && node dist/server.js",
     "generate": "prisma generate",
-    "migration": "cross-env DATABASE_HOST='localhost' prisma migrate dev",
+    "migration": "cross-env DATABASE_HOST='localhost' prisma migrate dev --url postgresql://postgres:docker@localhost:5432/pta",
     "migration:deploy": "prisma migrate deploy",
     "studio": "cross-env DATABASE_HOST='localhost' prisma studio"
   },
