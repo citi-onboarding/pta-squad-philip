@@ -46,3 +46,5 @@ model Emprestimo{
 
   livro Livro @relation(fields: [livro_id], references: [id])
 }
+
+
