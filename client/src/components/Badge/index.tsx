@@ -5,14 +5,14 @@ interface BadgeProps {
 }
 
 const statusStyles = {
-    'Em andamento': 'bg-yellow-100 border-yellow-200 text-yellow-700',
-    'Devolvido': 'bg-green-100 border-green-200 text-green-700',
-    'Atrasado': 'bg-red-100 border-red-200 text-red-700'
+    'Em andamento': 'bg-[#FEF9C2] border-[#FFDF20] text-[#A65F00]',
+    'Devolvido': 'bg-[#00C38933] border-[#00C3894D] text-[#00C389]',
+    'Atrasado': 'bg-[#EF444433] border-[#EF44444D] text-[#EF4444]'
 }
 
 export function Badge({status}: BadgeProps){
     return (
-        <div className={`px-2 py-1 rounded-2xl border-solid border-2 ${statusStyles[status]}`}>
+        <div className={`px-2 py-1 rounded-2xl border-solid border-[0.83px] text-[14px] ${statusStyles[status]}`}>
             {status}
         </div>
     )
