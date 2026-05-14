@@ -1,5 +1,7 @@
 FROM node:22-slim
 
+ENV CI=true
+
 RUN apt-get update -y && apt-get install -y openssl
 RUN npm i -g pnpm
 
