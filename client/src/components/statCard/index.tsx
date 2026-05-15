@@ -1,5 +1,5 @@
 import {ElementType} from "react";
-
+//
 type TypeCard = 'Total de Livros' | 'Empréstimos Ativos' | 'Livros Atrasados'
 
 interface StatCardProps {
