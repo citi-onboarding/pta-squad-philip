@@ -42,16 +42,18 @@ class LivroController implements Crud {
         });
       }
 
-      const { httpStatus, message } = await this.citi.insertIntoDatabase({
-        titulo,
-        autor,
-        isbn,
-        editora,
-        ano,
-        quantidade_total,
-        quantidade_disponivel: quantidade_total,
-        categoria,
-      });
+      const livroData = {
+          titulo,
+          autor,
+          isbn,
+          editora,
+          ano,
+          quantidade_total,
+          quantidade_disponivel: quantidade_total,
+          categoria,
+      };
+
+    const { httpStatus, message } = await this.citi.insertIntoDatabase(livroData);
 
       return response.status(httpStatus).send({ message });
     } catch (error) {
