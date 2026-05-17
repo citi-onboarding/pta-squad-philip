@@ -5,6 +5,10 @@ import { Citi, Crud } from "../global";
 class LivroController implements Crud {
   constructor(private readonly citi = new Citi("Livro")) {}
 
+  /**
+   * Creates a new book from the request body.
+   * Validates required fields and ISBN format before saving it.
+   */
   create = async (request: Request, response: Response) => {
     try {
       const {
@@ -17,7 +21,7 @@ class LivroController implements Crud {
         categoria,
       } = request.body;
 
-      // Validates required fields before creating the book
+      // Checks whether any required book field was not provided.
       const valuesAreUndefined = this.citi.areValuesUndefined(
         titulo,
         autor,
@@ -33,7 +37,7 @@ class LivroController implements Crud {
           message: "Todos os campos são obrigatórios.",
         });
       }
-      // ISBN must contain either 10 or 13 numeric digits
+      // Normalizes the ISBN by counting only numeric digits.
       const isbnDigitsLength = String(isbn).replace(/\D/g, "").length;
 
       if (isbnDigitsLength !== 10 && isbnDigitsLength !== 13) {
@@ -42,6 +46,7 @@ class LivroController implements Crud {
         });
       }
 
+      // Sets the initial available quantity based on the total quantity.
       const livroData = {
           titulo,
           autor,
@@ -57,7 +62,7 @@ class LivroController implements Crud {
 
       return response.status(httpStatus).send({ message });
     } catch (error) {
-      // Logs unexpected server errors for debugging
+      // Logs unexpected errors and returns a generic server response.
       console.error(error);
 
       return response.status(500).send({
@@ -66,28 +71,35 @@ class LivroController implements Crud {
     }
   };
 
+  /**
+   * Lists books using optional query filters.
+   * Supported filters: title, author and category.
+   */
   getAll = async (request: Request, response: Response) => {
     try {
+      // Filters are received through query parameters.
       const { titulo, autor, categoria } = request.query;
 
       const livros = await prisma.livro.findMany({
-        // Applies filters only when query parameters are provided
+        // Undefined filters are ignored by Prisma.
         where: {
-          // Performs case-insensitive search by title
+          // Applies a case-insensitive partial match for the title.
           titulo: titulo
             ? { contains: String(titulo), mode: "insensitive" }
             : undefined,
 
-          // Performs case-insensitive search by author
+          // Applies a case-insensitive partial match for the author.
           autor: autor
             ? { contains: String(autor), mode: "insensitive" }
             : undefined,
+          // Applies an exact category filter when provided.
           categoria: categoria ? String(categoria) : undefined,
         },
       });
 
       return response.status(200).send(livros);
     } catch (error) {
+      // Logs unexpected errors and returns a generic server response.
       console.error(error);
 
       return response.status(500).send({
@@ -96,13 +108,17 @@ class LivroController implements Crud {
     }
   };
 
+  /**
+   * Retrieves a single book by its route parameter ID.
+   * Includes the related loan history in the response.
+   */
   getById = async (request: Request, response: Response) => {
     try {
+      // The book ID is received through route parameters.
       const { id } = request.params;
 
       const livro = await prisma.livro.findFirst({
         where: { id },
-        // Includes loan history in the book details response
         include: { emprestimos: true },
       });
 
@@ -114,6 +130,7 @@ class LivroController implements Crud {
 
       return response.status(200).send(livro);
     } catch (error) {
+      // Logs unexpected errors and returns a generic server response.
       console.error(error);
 
       return response.status(500).send({
@@ -122,8 +139,12 @@ class LivroController implements Crud {
     }
   };
 
+  /**
+   * Deletes a book using the ID received from route parameters.
+   */
   delete = async (request: Request, response: Response) => {
     try {
+      // The book ID is received through route parameters.
       const { id } = request.params;
 
       const { httpStatus, messageFromDelete } = await this.citi.deleteValue(id);
@@ -132,6 +153,7 @@ class LivroController implements Crud {
         message: messageFromDelete,
       });
     } catch (error) {
+      // Logs unexpected errors and returns a generic server response.
       console.error(error);
 
       return response.status(500).send({
