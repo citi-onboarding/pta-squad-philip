@@ -25,7 +25,7 @@ export function BookCard({
   onDelete,
 }: BookCardProps) {
   return (
-    <article className="flex min-h-[410px] w-full max-w-[300px] flex-col rounded-md border border-slate-200 bg-white p-4 shadow-md">
+    <article className="flex min-h-[410px] w-full flex-col rounded-md border border-slate-200 bg-white p-4 shadow-md">
       <div className="mb-4 aspect-[345/256] w-full overflow-hidden rounded bg-slate-100">
         {imageUrl ? (
           <img
