@@ -54,7 +54,7 @@ export default function LivrosPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F9FA]">
-      <div className="w-full max-w-[1100px] mx-auto px-[24px]">
+      <div className="w-full max-w-[1100px] mx-auto px-[24px] pb-4">
         <div className="pt-4">
           <h1 className="font-medium text-[24px]">Livros</h1>
 
