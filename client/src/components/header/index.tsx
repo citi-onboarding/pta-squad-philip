@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Home, BookOpen, Plus, Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button/button";
+import { Button } from "@/components/ui/button";
 import logoCiti from "@/assets/icons/logoCiti_semfundo 1.png";
 
 export function Header() {
@@ -59,15 +59,16 @@ export function Header() {
             />
           </Link>
 
-          <Button
-            text="Novo Livro"
-            icon={<Plus size={18} />}
-            iconPosition="left"
-            variantColor="bg-[#00C389] text-white"
-            customSize="w-fit h-[40px]"
-            className="whitespace-nowrap text-sm md:text-base"
-            onClick={() => console.log("Funcionando!")}
-          />
+          <Link href="/livros/novo">
+            <Button
+              text="Novo Livro"
+              icon={<Plus size={18} />}
+              iconPosition="left"
+              variantColor="bg-[#00C389] text-white"
+              customSize="w-fit h-[40px]"
+              className="whitespace-nowrap text-sm md:text-base"
+            />
+          </Link>
         </div>
 
         <div className="flex md:hidden items-center relative">
