@@ -1,7 +1,7 @@
 "use client";
 
 import { Eye, Bookmark, Trash2 } from "lucide-react";
-import { Button } from "../ui/button/button";
+import { Button } from "@/components/ui/button";
 
 interface BookCardProps {
   title: string;
@@ -41,17 +41,11 @@ export function BookCard({
       </div>
 
       <div className="mb-5">
-        <h3 className="mb-2 text-base font-semibold text-slate-900">
-          {title}
-        </h3>
+        <h3 className="mb-2 text-base font-semibold text-slate-900">{title}</h3>
 
-        <p className="mb-2 text-sm text-slate-500">
-          {author}
-        </p>
+        <p className="mb-2 text-sm text-slate-500">{author}</p>
 
-        <p className="mb-2 text-xs font-medium text-emerald-500">
-          {category}
-        </p>
+        <p className="mb-2 text-xs font-medium text-emerald-500">{category}</p>
 
         <p className="text-xs font-medium text-slate-800">
           Disponível: {availableQuantity} unidade(s)
