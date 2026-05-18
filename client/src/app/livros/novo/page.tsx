@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import type { FormEvent } from "react";
 
@@ -16,6 +17,7 @@ export interface FormDataProps {
 
 export default function RegisterNewBook() {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -200,16 +202,19 @@ export default function RegisterNewBook() {
             )}
           </div>
 
-          <div className="mt-4 flex justify-end gap-4 border-t border-slate-100 pt-6">
+          <div className="mt-4 flex flex-col md:flex-row md:justify-end gap-4 border-t border-slate-100 pt-6">
             <Button
               type="button"
               text="Cancelar"
               variantColor="bg-transparent text-[#00C389] border border-[#00C389]"
+              className="w-full md:w-fit"
+              onClick={() => router.push("/")}
             />
             <Button
               type="submit"
               text="Salvar Livro"
               variantColor="bg-[#00C389] text-white hover:bg-[#00b07d]"
+              className="w-full md:w-fit"
             />
           </div>
         </form>
