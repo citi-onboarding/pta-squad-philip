@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import type { FormEvent } from "react";
+import type { FormEvent, ChangeEvent } from "react";
 
 export interface FormDataProps {
   titulo: string;
@@ -18,6 +18,18 @@ export interface FormDataProps {
 export default function RegisterNewBook() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
+
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+    const fieldName = e.target.name;
+
+    if (errors[fieldName]) {
+      setErrors((prevErrors) => {
+        const newErrors = { ...prevErrors };
+        delete newErrors[fieldName];
+        return newErrors;
+      });
+    }
+  }
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -65,9 +77,9 @@ export default function RegisterNewBook() {
 
   return (
     <div className="min-h-screen bg-[#F7F9FA] w-full overflow-x-hidden">
-      <main className="mx-auto max-w-[896px] pt-[20px] px-6 pb-10">
-        <header className="mb-[20px]">
-          <h2 className="text-2xl md:text-3xl font-semibold text-slate-800">
+      <main className="mx-auto max-w-[896px] pt-[32px] px-6 pb-10">
+        <header className="mb-[32px]">
+          <h2 className="text-xl md:text-2xl font-semibold text-slate-800">
             Cadastrar Novo Livro
           </h2>
           <p className="mt-2 text-sm md:text-base text-slate-500">
@@ -91,6 +103,7 @@ export default function RegisterNewBook() {
                 name="titulo"
                 className={inputClass}
                 placeholder="Digite o título do livro"
+                onChange={handleChange}
               />
               {errors.titulo && (
                 <p className="text-xs text-red-500 mt-1">{errors.titulo}</p>
@@ -107,6 +120,7 @@ export default function RegisterNewBook() {
                 name="autor"
                 className={inputClass}
                 placeholder="Digite o nome do autor"
+                onChange={handleChange}
               />
               {errors.autor && (
                 <p className="text-xs text-red-500 mt-1">{errors.autor}</p>
@@ -123,6 +137,7 @@ export default function RegisterNewBook() {
                 name="isbn"
                 className={inputClass}
                 placeholder="Digite o ISBN"
+                onChange={handleChange}
               />
               {errors.isbn && (
                 <p className="text-xs text-red-500 mt-1">{errors.isbn}</p>
@@ -139,6 +154,7 @@ export default function RegisterNewBook() {
                 name="editora"
                 className={inputClass}
                 placeholder="Digite a editora"
+                onChange={handleChange}
               />
               {errors.editora && (
                 <p className="text-xs text-red-500 mt-1">{errors.editora}</p>
@@ -155,6 +171,7 @@ export default function RegisterNewBook() {
                 name="ano"
                 className={inputClass}
                 placeholder="Digite o ano"
+                onChange={handleChange}
               />
               {errors.ano && (
                 <p className="text-xs text-red-500 mt-1">{errors.ano}</p>
@@ -171,6 +188,7 @@ export default function RegisterNewBook() {
                 name="quantidade"
                 className={inputClass}
                 placeholder="Digite a quantidade"
+                onChange={handleChange}
               />
               {errors.quantidade && (
                 <p className="text-xs text-red-500 mt-1">{errors.quantidade}</p>
@@ -190,6 +208,7 @@ export default function RegisterNewBook() {
                     name="categoria"
                     value={cat.toLowerCase()}
                     className="peer sr-only"
+                    onChange={handleChange}
                   />
                   <div className="flex w-[146.88px] h-[174.86px] flex-col items-center justify-end rounded-[8px] border-[1.67px] border-slate-200 bg-white px-[17.66px] pt-[17.66px] pb-[1.67px] text-sm text-slate-500 transition-all hover:bg-slate-50 peer-checked:border-[#00C389] peer-checked:bg-[#E6F9F0] peer-checked:font-medium peer-checked:text-[#00C389] gap-[8px]">
                     {cat}
