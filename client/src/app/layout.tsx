@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "styles/globals.css";
-import { Header } from "@/components/header/header";
+import { Header } from "@/components/header";
 
 export const metadata: Metadata = {
   title: "Biblioteca Escolar",
