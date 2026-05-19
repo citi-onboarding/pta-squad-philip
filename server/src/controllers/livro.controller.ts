@@ -72,41 +72,42 @@ class LivroController implements Crud {
   };
 
   /**
-   * Lists books using optional query filters.
-   * Supported filters: title, author and category.
-   */
-  getAll = async (request: Request, response: Response) => {
-    try {
-      // Filters are received through query parameters.
-      const { titulo, autor, categoria } = request.query;
+   * Lists books using filters.
+   * Supported filters: title and author.
+   */  
+    getAll = async (request: Request, response: Response) => {
+        try {
+          // Retrieves optional query filters from request params
+          const { titulo, categoria } = request.query;
+          
+          // Applies category filter only when provided
+          const whereCondition: any = {
+            categoria: categoria ? String(categoria) : undefined,
+          };
 
-      const livros = await prisma.livro.findMany({
-        // Undefined filters are ignored by Prisma.
-        where: {
-          // Applies a case-insensitive partial match for the title.
-          titulo: titulo
-            ? { contains: String(titulo), mode: "insensitive" }
-            : undefined,
+          // Applies category filter only when provided
+          if (titulo) {
+            whereCondition.OR = [
+              { titulo: { contains: String(titulo), mode: "insensitive" } },
+              { autor: { contains: String(titulo), mode: "insensitive" } },
+            ];
+          }
 
-          // Applies a case-insensitive partial match for the author.
-          autor: autor
-            ? { contains: String(autor), mode: "insensitive" }
-            : undefined,
-          // Applies an exact category filter when provided.
-          categoria: categoria ? String(categoria) : undefined,
-        },
-      });
+          // Returns all books matching the applied filters
+          const livros = await prisma.livro.findMany({
+            where: whereCondition,
+          });
 
-      return response.status(200).send(livros);
-    } catch (error) {
-      // Logs unexpected errors and returns a generic server response.
-      console.error(error);
+          return response.status(200).send(livros);
+        } catch (error) {
+          console.error(error);
 
-      return response.status(500).send({
-        message: "Erro interno ao listar livros.",
-      });
-    }
-  };
+          // Handles unexpected internal server errors
+          return response.status(500).send({
+            message: "Erro interno ao listar livros.",
+          });
+        }
+      };
 
   /**
    * Retrieves a single book by its route parameter ID.
