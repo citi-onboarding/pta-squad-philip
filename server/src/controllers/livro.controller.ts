@@ -1,3 +1,4 @@
+import Fuse from "fuse.js";
 import { Request, Response } from "express";
 import prisma from "@database";
 import { Citi, Crud } from "../global";
@@ -75,39 +76,44 @@ class LivroController implements Crud {
    * Lists books using filters.
    * Supported filters: title and author.
    */  
-    getAll = async (request: Request, response: Response) => {
-        try {
-          // Retrieves optional query filters from request params
-          const { titulo, categoria } = request.query;
-          
-          // Applies category filter only when provided
-          const whereCondition: any = {
-            categoria: categoria ? String(categoria) : undefined,
-          };
+  getAll = async (request: Request, response: Response) => {
+    try {
+      // Retrieves optional query filters from request params
+      const { titulo, categoria } = request.query;
 
-          // Applies category filter only when provided
-          if (titulo) {
-            whereCondition.OR = [
-              { titulo: { contains: String(titulo), mode: "insensitive" } },
-              { autor: { contains: String(titulo), mode: "insensitive" } },
-            ];
-          }
+      const termo = titulo ? String(titulo).trim() : "";
 
-          // Returns all books matching the applied filters
-          const livros = await prisma.livro.findMany({
-            where: whereCondition,
-          });
+      // First filters by category in the database, if provided
+      const livros = await prisma.livro.findMany({
+        where: {
+          categoria: categoria ? String(categoria) : undefined,
+        },
+      });
 
-          return response.status(200).send(livros);
-        } catch (error) {
-          console.error(error);
+      // If there is no search term, returns only the category-filtered result
+      if (!termo) {
+        return response.status(200).send(livros);
+      }
 
-          // Handles unexpected internal server errors
-          return response.status(500).send({
-            message: "Erro interno ao listar livros.",
-          });
-        }
-      };
+      // Applies fuzzy search by title and author
+      const fuse = new Fuse(livros, {
+        keys: ["titulo", "autor"],
+        threshold: 0.4,
+        ignoreLocation: true,
+      });
+
+      const livrosFiltrados = fuse.search(termo).map((result) => result.item);
+
+      return response.status(200).send(livrosFiltrados);
+    } catch (error) {
+      console.error(error);
+
+      // Handles unexpected internal server errors
+      return response.status(500).send({
+        message: "Erro interno ao listar livros.",
+      });
+    }
+  };
 
   /**
    * Retrieves a single book by its route parameter ID.
