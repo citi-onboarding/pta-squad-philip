@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogOverlay,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
@@ -222,6 +223,7 @@ export function LoanModal({ open, onOpenChange, bookTitle }: LoanModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
+      <DialogOverlay className="backdrop-blur-sm bg-black/20" />
       <DialogContent className="max-w-[393px] [&>button]:hidden">
         <DialogHeader className="flex justify-between">
           <DialogTitle className="text-2xl flex justify-between">Realizar empréstimo
