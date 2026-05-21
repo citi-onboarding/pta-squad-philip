@@ -30,9 +30,8 @@ export default function LivrosPage() {
   const [livroSelecionado, setLivroSelecionado] = useState<Livro | null>(null);
   const [deleteError, setDeleteError] = useState("");
 
-  // Estados do LoanModal
   const [loanOpen, setLoanOpen] = useState(false);
-  const [livroEmprestimo, setLivroEmprestimo] = useState<Livro | null>(null);
+  const [livroLoan, setBookLoan] = useState<Livro | null>(null);
 
   const buscarLivros = async () => {
     const params: Record<string, string> = {};
@@ -90,7 +89,7 @@ export default function LivrosPage() {
               availableQuantity={livro.quantidade_disponivel}
               onView={() => console.log(livro.id)}
               onBorrow={() => {
-                setLivroEmprestimo(livro);
+                setBookLoan(livro);
                 setLoanOpen(true);
               }}
               onDelete={() => setLivroSelecionado(livro)}
@@ -102,7 +101,7 @@ export default function LivrosPage() {
       <LoanModal
         open={loanOpen}
         onOpenChange={setLoanOpen}
-        bookTitle={livroEmprestimo?.titulo ?? ""}
+        bookTitle={livroLoan?.titulo ?? ""}
       />
 
       {livroSelecionado && (
