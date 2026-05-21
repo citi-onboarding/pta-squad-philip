@@ -1,7 +1,12 @@
 import express from "express";
+import LivroController from "../controllers/livro.controller";
 
 const livroRoutes = express.Router();
+const livroController = new LivroController();
 
-// rotas de livro aqui
+livroRoutes.post("/", livroController.create);
+livroRoutes.get("/", livroController.getAll);
+livroRoutes.get("/:id", livroController.getById);
+livroRoutes.delete("/:id", livroController.delete);
 
 export default livroRoutes;
