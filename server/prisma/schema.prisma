@@ -42,6 +42,7 @@ model Emprestimo{
   email_cliente String
   data_locacao DateTime @default(now())
   data_prevista_devolucao DateTime
+  data_devolucao_real DateTime?
   status Status @default(Em_andamento)
 
   livro Livro @relation(fields: [livro_id], references: [id])
