@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/Badge';
+import { Badge } from '../bagde';
 
 // Defines the props expected by the LoanHistoryCard component
 interface LoanHistoryCardProps {

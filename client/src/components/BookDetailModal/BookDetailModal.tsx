@@ -89,10 +89,11 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ id, isOpen, on
   };
 
   return (
-    // Modal overlay background
-    <div style={styles.overlay}>
-      {/* Main modal container */}
-      <div style={styles.modalBox}>
+    <div style={styles.overlay} onClick={onClose}>
+      <div
+        style={styles.modalBox}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal header with close button */}
         <div style={styles.modalHeader}>
           <span style={styles.modalTitle}>Detalhes do Livro</span>

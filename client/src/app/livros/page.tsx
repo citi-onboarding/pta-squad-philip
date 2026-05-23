@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+
 import { BookCard } from "@/components/bookCard";
 import BookFilters from "@/components/bookFilters";
+import { BookDetailModal } from "@/components/BookDetailModal/BookDetailModal";
 
 interface Livro {
   id: string;
@@ -27,9 +29,12 @@ export default function LivrosPage() {
   const [livros, setLivros] = useState<Livro[]>([]);
   const [livroSelecionado, setLivroSelecionado] = useState<Livro | null>(null);
   const [deleteError, setDeleteError] = useState("");
+  const [bookDetailId, setBookDetailId] = useState<string | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const buscarLivros = async () => {
     const params: Record<string, string> = {};
+
     if (search) {
       params.titulo = search;
     }
@@ -49,16 +54,22 @@ export default function LivrosPage() {
     if (!livroSelecionado) return;
 
     try {
-      await axios.delete(`http://localhost:3001/livros/${livroSelecionado.id}`);
+      await axios.delete(
+        `http://localhost:3001/livros/${livroSelecionado.id}`
+      );
 
       setLivros((livrosAtuais) =>
-        livrosAtuais.filter((livro) => livro.id !== livroSelecionado.id)
+        livrosAtuais.filter(
+          (livro) => livro.id !== livroSelecionado.id
+        )
       );
 
       setLivroSelecionado(null);
       setDeleteError("");
     } catch (error) {
-      setDeleteError("Não foi possível excluir o livro. Tente novamente.");
+      setDeleteError(
+        "Não foi possível excluir o livro. Tente novamente."
+      );
     }
   };
 
@@ -93,7 +104,10 @@ export default function LivrosPage() {
               category={livro.categoria}
               imageUrl={capas[livro.categoria]}
               availableQuantity={livro.quantidade_disponivel}
-              onView={() => console.log(livro.id)}
+              onView={() => {
+                setBookDetailId(livro.id);
+                setIsDetailModalOpen(true);
+              }}
               onBorrow={() => console.log(livro.id)}
               onDelete={() => setLivroSelecionado(livro)}
             />
@@ -101,6 +115,7 @@ export default function LivrosPage() {
         </div>
       </div>
 
+      {/* MODAL DE EXCLUSÃO */}
       {livroSelecionado && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
@@ -112,7 +127,9 @@ export default function LivrosPage() {
             </p>
 
             {deleteError && (
-              <p className="mt-3 text-sm text-red-600">{deleteError}</p>
+              <p className="mt-3 text-sm text-red-600">
+                {deleteError}
+              </p>
             )}
 
             <div className="mt-6 flex justify-end gap-3">
@@ -138,6 +155,16 @@ export default function LivrosPage() {
           </div>
         </div>
       )}
+
+      {/* MODAL DE DETALHES */}
+      <BookDetailModal
+        id={bookDetailId || ""}
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setBookDetailId(null);
+        }}
+      />
     </div>
   );
 }
