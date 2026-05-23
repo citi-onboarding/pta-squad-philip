@@ -14,6 +14,7 @@ type EnviarConfirmacaoDevolucaoParams = {
   tituloLivro: string;
 };
 
+// Shared SMTP transporter used by all email sending functions.
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
@@ -28,6 +29,7 @@ function formatarData(data: Date | string) {
   return new Date(data).toLocaleDateString("pt-BR");
 }
 
+// The logo is attached to the email and referenced in the HTML using cid:logoCiti.
 const caminhoLogoCiti = path.resolve(
   process.cwd(),
   "src/assets/icons/logoCitiSemFundo.png",
@@ -46,6 +48,7 @@ type TemplateEmailParams = {
   dataValor?: string;
 };
 
+// Centralizes the email layout to keep reminder and confirmation emails visually consistent.
 function gerarTemplateEmail({
   nomeCliente,
   titulo,
@@ -149,6 +152,7 @@ function gerarTemplateEmail({
   `;
 }
 
+// Sends a return reminder email using the shared template.
 export async function enviarLembrete({
   emailCliente,
   nomeCliente,
@@ -184,6 +188,7 @@ export async function enviarLembrete({
   });
 }
 
+// Sends a confirmation email after the book return is successfully registered.
 export async function enviarConfirmacaoDevolucao({
   emailCliente,
   nomeCliente,

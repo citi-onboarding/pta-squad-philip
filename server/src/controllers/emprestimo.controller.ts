@@ -193,6 +193,7 @@ class EmprestimoController implements Crud {
     }
   };
 
+  // Sends a manual reminder only for loans already marked as overdue.
   sendReminder = async (request: Request, response: Response) => {
     try {
       const { id } = request.params;
@@ -208,6 +209,7 @@ class EmprestimoController implements Crud {
           .send({ message: "Empréstimo não encontrado." });
       }
 
+      // Business rule: reminders can only be sent for overdue loans.
       if (emprestimo.status !== "Atrasado") {
         return response.status(400).send({
           message: "Só é possível enviar lembrete para empréstimos atrasados.",
@@ -233,6 +235,7 @@ class EmprestimoController implements Crud {
     }
   };
 
+  // Handles the book return flow and restores the book availability.
   returnBook = async (request: Request, response: Response) => {
     try {
       const { id } = request.params;
@@ -248,6 +251,7 @@ class EmprestimoController implements Crud {
           .send({ message: "Empréstimo não encontrado." });
       }
 
+      // Business rule: only active or overdue loans can be returned.
       if (
         emprestimo.status !== "Em_andamento" &&
         emprestimo.status !== "Atrasado"
@@ -257,6 +261,7 @@ class EmprestimoController implements Crud {
           .send({ message: "Esse empréstimo não pode ser devolvido." });
       }
 
+      // Business rule: returning a book must update the loan status and restore book stock together.
       const [emprestimosAtualizados] = await prisma.$transaction([
         prisma.emprestimo.update({
           where: { id },
@@ -277,6 +282,7 @@ class EmprestimoController implements Crud {
           tituloLivro: emprestimo.livro.titulo,
         });
       } catch (error) {
+        // Side effect: email failure should not rollback a successful book return.
         console.error("Erro ao enviar confirmação de devolução:", error);
       }
 

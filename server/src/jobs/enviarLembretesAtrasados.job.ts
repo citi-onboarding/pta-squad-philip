@@ -2,6 +2,7 @@ import cron from "node-cron";
 import prisma from "@database";
 import { enviarLembrete } from "src/services/email.services";
 
+// Creates a full-day interval to compare DateTime fields by calendar day.
 function criarIntervaloDoDia(data: Date) {
   const inicio = new Date(data);
   inicio.setHours(0, 0, 0, 0);
@@ -12,6 +13,7 @@ function criarIntervaloDoDia(data: Date) {
   return { inicio, fim };
 }
 
+// Adds a delay between emails to avoid SMTP provider rate limits.
 function esperar(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -24,6 +26,7 @@ async function enviarLembretePreventivo() {
 
   const intervaloAmanha = criarIntervaloDoDia(amanha);
 
+  // Preventive reminders are sent once, one day before the expected return date.
   const emprestimos = await prisma.emprestimo.findMany({
     where: {
       status: "Em_andamento",
@@ -71,6 +74,7 @@ async function enviarLembreteDeAtraso() {
   const hoje = new Date();
   const intervaloHoje = criarIntervaloDoDia(hoje);
 
+  // Active loans past their expected return date are persisted as overdue.
   await prisma.emprestimo.updateMany({
     where: {
       status: "Em_andamento",
@@ -84,6 +88,7 @@ async function enviarLembreteDeAtraso() {
     },
   });
 
+  // Overdue reminders are limited to one email per loan per day.
   const emprestimos = await prisma.emprestimo.findMany({
     where: {
       status: "Atrasado",
@@ -133,6 +138,7 @@ async function enviarLembreteDeAtraso() {
 }
 
 export function iniciarEnvioAutomaticoDeLembretes() {
+  // Runs every day at 08:00 to process preventive and overdue reminders.
   cron.schedule("0 8 * * *", async () => {
     try {
       console.log("Iniciando processamento automático de lembretes.");
@@ -142,7 +148,7 @@ export function iniciarEnvioAutomaticoDeLembretes() {
 
       console.log("Lembretes automáticos processados com sucesso.");
     } catch (error) {
-      console.error("Erro ao processar lembtes automáticos:", error);
+      console.error("Erro ao processar lembretes automáticos:", error);
     }
   });
 }
