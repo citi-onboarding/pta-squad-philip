@@ -4,8 +4,7 @@ import prisma from "@database";
 import {
   enviarConfirmacaoDevolucao,
   enviarLembrete,
-} from "src/services/email.services";
-import { request } from "http";
+} from "../services/email.services";
 
 class EmprestimoController implements Crud {
   constructor(private readonly citi = new Citi("Emprestimo")) {}
