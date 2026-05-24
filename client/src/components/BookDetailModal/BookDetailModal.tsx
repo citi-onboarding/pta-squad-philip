@@ -4,11 +4,11 @@ import { LoanHistoryCard } from './LoanHistoryCard';
 
 // Static asset mapping matching book categories to local covers
 const capas: Record<string, string> = {
-  Romance: '/img/romance.jpg',
-  Tecnologia: '/img/tecnologia.jpg',
-  Historia: '/img/historia.jpg',
-  Ciencias: '/img/ciencias.jpg',
-  Infantil: '/img/infantil.jpg',
+  Romance: '/Capas de Livros/Romance.png',
+  Tecnologia: '/Capas de Livros/Tecnologia.png',
+  Historia: '/Capas de Livros/Historia.png',
+  Ciencias: '/Capas de Livros/Ciencias.png',
+  Infantil: '/Capas de Livros/Infantil.png',
 }
 
 // Interface representing a loan returned by the backend
@@ -91,9 +91,20 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ id, isOpen, on
   return (
     <div style={styles.overlay} onClick={onClose}>
       <div
-        style={styles.modalBox}
-        onClick={(e) => e.stopPropagation()}
-      >
+        style={{ ...styles.modalBox, overflowY: 'auto', scrollbarWidth: 'none' }} 
+      className="custom-scroll-invisivel"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <style dangerouslySetInnerHTML={{__html: `
+        ::-webkit-scrollbar {
+          display: none !important;
+        }
+        * {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+      `}} />
+      
         {/* Modal header with close button */}
         <div style={styles.modalHeader}>
           <span style={styles.modalTitle}>Detalhes do Livro</span>
@@ -124,27 +135,27 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ id, isOpen, on
                 
                 {/* Grid containing book metadata */}
                 <div style={styles.detailsGrid}>
-                  <div>
+                  <div style={{ width: '50%', marginBottom: '18px' }}>
                     <span style={styles.label}>ISBN</span>
                     <p style={styles.value}>{livro.isbn}</p>
                   </div>
-                  <div>
+                  <div style={{ width: '50%', marginBottom: '18px' }}>
                     <span style={styles.label}>Categoria</span>
                     <p style={{ ...styles.value, color: '#10b981' }}>{livro.categoria}</p>
                   </div>
-                  <div>
+                  <div style={{ width: '50%', marginBottom: '18px' }}>
                     <span style={styles.label}>Editora</span>
                     <p style={styles.value}>{livro.editora}</p>
                   </div>
-                  <div>
+                  <div style={{ width: '50%', marginBottom: '18px' }}>
                     <span style={styles.label}>Ano</span>
                     <p style={styles.value}>{livro.ano}</p>
                   </div>
-                  <div>
+                  <div style={{ width: '50%' }}>
                     <span style={styles.label}>Quantidade Total</span>
                     <p style={styles.value}>{livro.quantidade_total} unidades</p>
                   </div>
-                  <div>
+                  <div style={{ width: '50%' }}>
                     <span style={styles.label}>Quantidade Disponível</span>
                     <p style={{ ...styles.value, color: '#10b981' }}>{livro.quantidade_disponivel} unidades</p>
                   </div>
@@ -155,7 +166,12 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ id, isOpen, on
             {/* Bottom section - Loan history */}
             <h3 style={styles.historyTitle}>Histórico de Empréstimos</h3>
             
-            <div style={styles.historyContainer}>
+            <div style={{ ...styles.historyContainer, maxHeight: '420px', overflowY: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }} className="custom-scroll-invisivel">
+              <style dangerouslySetInnerHTML={{__html: `
+                .custom-scroll-invisivel::-webkit-scrollbar {
+                  display: none !important;
+                }
+              `}} />
               {/* Displays loan cards if loans exist */}
               {tresUltimos.length > 0 ? (
                 tresUltimos.map((loan) => (
@@ -215,9 +231,9 @@ const styles = {
   // Book author styling
   bookAuthor: { fontSize: '15px', color: '#64748b', margin: '0 0 24px 0' },
   // Grid for book metadata
-  detailsGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 24px' },
+  detailsGrid: { display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', width: '100%', },
   // Label styling
-  label: { fontSize: '13px', color: '#94a3b8', display: 'block', marginBottom: '2px' },
+  label: { fontSize: '13px', color: '#94a3b8', display: 'block', marginBottom: '2px', },
   // Value styling
   value: { fontSize: '15px', fontWeight: 500, color: '#334155', margin: 0 },
   // Loan history title styling
@@ -225,5 +241,7 @@ const styles = {
   // Loan history container layout
   historyContainer: { display: 'flex', flexDirection: 'column' as const },
   // Message displayed when there is no history
-  noHistory: { color: '#94a3b8', fontStyle: 'italic' as const, fontSize: '14px', marginTop: '4px' }
+  noHistory: { color: '#94a3b8', fontStyle: 'italic' as const, fontSize: '14px', marginTop: '4px' },
+  itemContainer: { width: '48%', },
+  historyListContainer: { maxHeight: '320px', overflowY: 'auto' as const, scrollbarWidth: 'none' as const, msOverflowStyle: 'none', },
 };

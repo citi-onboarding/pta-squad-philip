@@ -41,7 +41,7 @@ export const LoanHistoryCard: React.FC<LoanHistoryCardProps> = ({
         {/* Customer name and status badge */}
         <div style={styles.nameRow}>
           <span style={styles.name}>{nomeCliente}</span>
-          <Badge status={status} text={statusFormatado} />
+          <Badge status={(status === "Em_andamento" ? "Em andamento" : status) as any} text={statusFormatado} />
         </div>
 
          {/* Customer email */}
