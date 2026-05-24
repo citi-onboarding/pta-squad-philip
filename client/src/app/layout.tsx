@@ -15,10 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body>
+      <body className="bg-[#F7F9FA]">
         <Header />
         <main>{children}</main>
-      </body>
+        </body>
     </html>
   );
 }
