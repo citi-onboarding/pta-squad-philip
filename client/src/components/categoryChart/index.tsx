@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Bar,
-  BarChart,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-} from "recharts";
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid } from "recharts";
 import { ChartContainer, ChartConfig } from "@/components/ui/chart";
 
 interface CategoryData {
@@ -33,14 +26,23 @@ const chartConfig = {
     color: "#00C389",
   },
 } satisfies ChartConfig;
-
 export default function CategoryChart({ data }: CategoryChartProps) {
+  const isEmpty = data.every((item) => item.quantidade === 0);
+
+  if (isEmpty) {
+    return (
+      <div className="h-[250px] w-full flex items-center justify-center text-gray-400 text-sm">
+        Nenhum livro cadastrado ainda.
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <ChartContainer config={chartConfig} className="h-[250px] w-full">
+    <div className="w-full h-[250px]">
+      <ChartContainer config={chartConfig} className="h-full w-full min-w-0">
         <BarChart
           data={data}
-          barCategoryGap="95%"
+          barCategoryGap="30%"
           margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
         >
           <CartesianGrid vertical={false} stroke="#f0f0f0" />
