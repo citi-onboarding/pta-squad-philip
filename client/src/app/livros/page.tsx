@@ -33,6 +33,8 @@ export default function LivrosPage() {
   const [loanOpen, setLoanOpen] = useState(false);
   const [livroLoan, setBookLoan] = useState<Livro | null>(null);
 
+  const [loanError, setLoanError] = useState<string | null>(null);
+
   const buscarLivros = async () => {
     const params: Record<string, string> = {};
     if (search) params.titulo = search;
@@ -40,6 +42,48 @@ export default function LivrosPage() {
 
     const response = await axios.get("http://localhost:3001/livros", { params });
     setLivros(Array.isArray(response.data) ? response.data : []);
+  };
+
+  const handleConfirmarEmprestimo = async (data: {
+    nome_cliente: string;
+    email_cliente: string;
+    data_prevista_devolucao: string;
+  }) => {
+    if (!livroLoan) return;
+
+    try {
+      setLoanError(null);
+
+      const dataString = data.data_prevista_devolucao;
+
+      const dataObjeto = new Date(`${dataString}T12:00:00`);
+
+      await axios.post("http://localhost:3001/emprestimos", {
+        livro_id: String(livroLoan.id),
+        nome_cliente: data.nome_cliente,
+        email_cliente: data.email_cliente,
+        data_prevista_devolucao: dataObjeto,
+        data_locacao: new Date().toISOString(),
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      setLoanOpen(false);
+      setBookLoan(null);     
+      
+      buscarLivros();
+      
+    } catch (error: any) {
+      console.error("Erro ao criar empréstimo.", error);
+
+      if (error.response && error.response.data) {
+        const mensagemServidor = error.response.data.message || "Erro ao realizar empréstimo.";
+        setLoanError(mensagemServidor);
+      } else {
+        setLoanError("Erro ao realizar o empréstimo, tente novamente.");
+      }
+    }
   };
 
   const deletarLivro = async () => {
@@ -100,8 +144,16 @@ export default function LivrosPage() {
 
       <LoanModal
         open={loanOpen}
-        onOpenChange={setLoanOpen}
+        onOpenChange={(isOpen) => {
+          setLoanOpen(isOpen);
+          if (!isOpen) {
+            setLoanError(null);
+            setBookLoan(null);
+          }
+        }}
         bookTitle={livroLoan?.titulo ?? ""}
+        apiError={loanError}
+        onConfirm={handleConfirmarEmprestimo}
       />
 
       {livroSelecionado && (
