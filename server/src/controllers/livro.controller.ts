@@ -2,6 +2,7 @@ import Fuse from "fuse.js";
 import { Request, Response } from "express";
 import prisma from "@database";
 import { Citi, Crud } from "../global";
+import { atualizarEmprestimosAtrasados } from "src/services/emprestimo.service";
 
 class LivroController implements Crud {
   constructor(private readonly citi = new Citi("Livro")) {}
@@ -12,15 +13,8 @@ class LivroController implements Crud {
    */
   create = async (request: Request, response: Response) => {
     try {
-      const {
-        titulo,
-        autor,
-        isbn,
-        editora,
-        ano,
-        quantidade_total,
-        categoria,
-      } = request.body;
+      const { titulo, autor, isbn, editora, ano, quantidade_total, categoria } =
+        request.body;
 
       // Checks whether any required book field was not provided.
       const valuesAreUndefined = this.citi.areValuesUndefined(
@@ -30,7 +24,7 @@ class LivroController implements Crud {
         editora,
         ano,
         quantidade_total,
-        categoria
+        categoria,
       );
 
       if (valuesAreUndefined) {
@@ -38,6 +32,7 @@ class LivroController implements Crud {
           message: "Todos os campos são obrigatórios.",
         });
       }
+
       // Normalizes the ISBN by counting only numeric digits.
       const isbnDigitsLength = String(isbn).replace(/\D/g, "").length;
 
@@ -49,17 +44,18 @@ class LivroController implements Crud {
 
       // Sets the initial available quantity based on the total quantity.
       const livroData = {
-          titulo,
-          autor,
-          isbn,
-          editora,
-          ano,
-          quantidade_total,
-          quantidade_disponivel: quantidade_total,
-          categoria,
+        titulo,
+        autor,
+        isbn,
+        editora,
+        ano,
+        quantidade_total,
+        quantidade_disponivel: quantidade_total,
+        categoria,
       };
 
-    const { httpStatus, message } = await this.citi.insertIntoDatabase(livroData);
+      const { httpStatus, message } =
+        await this.citi.insertIntoDatabase(livroData);
 
       return response.status(httpStatus).send({ message });
     } catch (error) {
@@ -74,28 +70,31 @@ class LivroController implements Crud {
 
   /**
    * Lists books using filters.
-   * Supported filters: title and author.
-   */  
+   * Supported filters: title and category.
+   */
   getAll = async (request: Request, response: Response) => {
     try {
-      // Retrieves optional query filters from request params
+      // Updates overdue loans before returning any book visualization.
+      await atualizarEmprestimosAtrasados();
+
+      // Retrieves optional query filters from request params.
       const { titulo, categoria } = request.query;
 
       const termo = titulo ? String(titulo).trim() : "";
 
-      // First filters by category in the database, if provided
+      // First filters by category in the database, if provided.
       const livros = await prisma.livro.findMany({
         where: {
           categoria: categoria ? String(categoria) : undefined,
         },
       });
 
-      // If there is no search term, returns only the category-filtered result
+      // If there is no search term, returns only the category-filtered result.
       if (!termo) {
         return response.status(200).send(livros);
       }
 
-      // Applies fuzzy search by title and author
+      // Applies fuzzy search by title and author.
       const fuse = new Fuse(livros, {
         keys: ["titulo", "autor"],
         threshold: 0.4,
@@ -108,7 +107,7 @@ class LivroController implements Crud {
     } catch (error) {
       console.error(error);
 
-      // Handles unexpected internal server errors
+      // Handles unexpected internal server errors.
       return response.status(500).send({
         message: "Erro interno ao listar livros.",
       });
@@ -123,6 +122,9 @@ class LivroController implements Crud {
     try {
       // The book ID is received through route parameters.
       const { id } = request.params;
+
+      // Updates overdue loans before returning the book details modal data.
+      await atualizarEmprestimosAtrasados();
 
       const livro = await prisma.livro.findFirst({
         where: { id },
