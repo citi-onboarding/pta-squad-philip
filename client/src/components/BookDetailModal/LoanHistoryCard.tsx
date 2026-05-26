@@ -63,43 +63,67 @@ export const LoanHistoryCard: React.FC<LoanHistoryCardProps> = ({
       style={{
         ...styles.card,
         flexDirection: isMobile ? "column" : "row",
-        alignItems: isMobile ? "flex-start" : "center",
+        alignItems: isMobile ? "stretch" : "center",
       }}
     >
       {/* Left side content */}
-      <div style={styles.leftContent}>
-        <div style={styles.nameRow}>
+      <div
+        style={{
+          ...styles.leftContent,
+          width: isMobile ? "100%" : "auto",
+        }}
+      >
+        <div
+          style={{
+            ...styles.nameRow,
+            flexWrap: isMobile ? "wrap" : "nowrap",
+          }}
+        >
           <span style={styles.name}>{nomeCliente}</span>
           <Badge status={statusFormatado as any} text={statusFormatado} />
         </div>
 
         <p style={styles.email}>{emailCliente}</p>
 
-        <p style={styles.dates}>
-          <span style={styles.dateLabel}>Locação: </span>
-          <span style={styles.dateValue}>{formatarData(dataLocacao)}</span>
-          <span style={{ ...styles.dateLabel, marginLeft: "16px" }}>
-            Previsão:{" "}
-          </span>
-          <span style={styles.dateValue}>
-            {formatarData(dataPrevistaDevolucao)}
-          </span>
-        </p>
+        {/* Dates displayed as separated groups to avoid bad line breaks on mobile */}
+        <div
+          style={{
+            ...styles.datesContainer,
+            flexDirection: isMobile ? "column" : "row",
+            gap: isMobile ? "6px" : "16px",
+            alignItems: isMobile ? "flex-start" : "center",
+          }}
+        >
+          <div style={styles.dateGroup}>
+            <span style={styles.dateLabel}>Locação:</span>
+            <span style={styles.dateValue}>{formatarData(dataLocacao)}</span>
+          </div>
+
+          <div style={styles.dateGroup}>
+            <span style={styles.dateLabel}>Previsão:</span>
+            <span style={styles.dateValue}>
+              {formatarData(dataPrevistaDevolucao)}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Right side action buttons */}
       <div
         style={{
           ...styles.rightActions,
-          marginTop: isMobile ? "12px" : "0",
+          flexDirection: isMobile ? "column" : "row",
+          marginTop: isMobile ? "16px" : "0",
           width: isMobile ? "100%" : "auto",
-          justifyContent: isMobile ? "flex-end" : "center",
+          alignItems: isMobile ? "stretch" : "center",
+          justifyContent: isMobile ? "flex-start" : "flex-end",
         }}
       >
         {podeEnviarLembrete && (
           <Button
             style={{
               ...styles.btnReminder,
+              width: isMobile ? "100%" : "auto",
               cursor:
                 lembreteLoading || devolucaoLoading ? "not-allowed" : "pointer",
               opacity: lembreteLoading || devolucaoLoading ? 0.7 : 1,
@@ -116,6 +140,7 @@ export const LoanHistoryCard: React.FC<LoanHistoryCardProps> = ({
           <Button
             style={{
               ...styles.btnReturn,
+              width: isMobile ? "100%" : "auto",
               cursor:
                 devolucaoLoading || lembreteLoading ? "not-allowed" : "pointer",
               opacity: devolucaoLoading || lembreteLoading ? 0.7 : 1,
@@ -143,24 +168,62 @@ const styles = {
     marginBottom: "16px",
     background: "#fff",
   },
+
   // Left section layout
   leftContent: {
     display: "flex",
     flexDirection: "column" as const,
     gap: "6px",
   },
+
   // Row containing customer name and badge
-  nameRow: { display: "flex", alignItems: "center", gap: "8px" },
+  nameRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+
   // Customer name styling
-  name: { fontSize: "16px", fontWeight: 500, color: "#1e293b" },
+  name: {
+    fontSize: "16px",
+    fontWeight: 500,
+    color: "#1e293b",
+  },
+
   // Customer email styling
-  email: { fontSize: "14px", color: "#64748b", margin: 0 },
+  email: {
+    fontSize: "14px",
+    color: "#64748b",
+    margin: 0,
+    wordBreak: "break-word" as const,
+  },
+
   // Dates container styling
-  dates: { fontSize: "14px", margin: 0 },
+  datesContainer: {
+    display: "flex",
+    fontSize: "14px",
+    margin: 0,
+    flexWrap: "wrap" as const,
+  },
+
+  // Individual date group styling
+  dateGroup: {
+    display: "flex",
+    gap: "4px",
+    alignItems: "center",
+    whiteSpace: "nowrap" as const,
+  },
+
   // Label style for dates
-  dateLabel: { color: "#94a3b8" },
+  dateLabel: {
+    color: "#94a3b8",
+  },
+
   // Value style for dates
-  dateValue: { color: "#334155" },
+  dateValue: {
+    color: "#334155",
+  },
+
   // Right section actions layout
   rightActions: {
     display: "flex",
@@ -170,6 +233,7 @@ const styles = {
     marginLeft: "auto",
     flexShrink: 0,
   },
+
   // Reminder button styling
   btnReminder: {
     border: "1px solid #10b981",
