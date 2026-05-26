@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-
+import api from "@/services/api";
 import { BookCard } from "@/components/bookCard";
 import BookFilters from "@/components/bookFilters";
 import { BookDetailModal } from "@/components/BookDetailModal/BookDetailModal";
+import { LoanModal } from "@/components/loanModal";
+import { createLoan } from "@/services/loanPayload";
 
 interface Livro {
   id: string;
@@ -32,6 +33,16 @@ export default function LivrosPage() {
   const [bookDetailId, setBookDetailId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
+  // Controls whether the loan modal is open or closed
+  const [loanOpen, setLoanOpen] = useState(false);
+
+  // Stores the selected book for the loan modal
+  const [livroLoan, setBookLoan] = useState<Livro | null>(null);
+
+  // Stores API errors returned while creating a loan
+  const [loanError, setLoanError] = useState<string | null>(null);
+
+  // Fetches books from the backend using search and category filters
   const buscarLivros = async () => {
     const params: Record<string, string> = {};
 
@@ -43,13 +54,14 @@ export default function LivrosPage() {
       params.categoria = category;
     }
 
-    const response = await axios.get("http://localhost:3001/livros", {
+    const response = await api.get("/livros", {
       params,
     });
 
     setLivros(Array.isArray(response.data) ? response.data : []);
   };
 
+  // Creates a loan using the data received from the loan modal
   const handleConfirmarEmprestimo = async (data: {
     nome_cliente: string;
     email_cliente: string;
@@ -64,21 +76,14 @@ export default function LivrosPage() {
 
       const dataObjeto = new Date(`${dataString}T12:00:00`);
 
-      await axios.post(
-        "http://localhost:3001/emprestimos",
-        {
-          livro_id: String(livroLoan.id),
-          nome_cliente: data.nome_cliente,
-          email_cliente: data.email_cliente,
-          data_prevista_devolucao: dataObjeto,
-          data_locacao: new Date().toISOString(),
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      await createLoan({
+        livro_id: String(livroLoan.id),
+        nome_cliente: data.nome_cliente,
+        email_cliente: data.email_cliente,
+        data_prevista_devolucao: dataObjeto,
+        data_locacao: new Date().toISOString(),
+      });
+
       setLoanOpen(false);
       setBookLoan(null);
 
@@ -89,6 +94,18 @@ export default function LivrosPage() {
       if (error.response && error.response.data) {
         const mensagemServidor =
           error.response.data.message || "Erro ao realizar empréstimo.";
+
+        const mensagemNormalizada = String(mensagemServidor).toLowerCase();
+
+        if (
+          mensagemNormalizada.includes("indisponível") ||
+          mensagemNormalizada.includes("indisponivel") ||
+          mensagemNormalizada.includes("estoque")
+        ) {
+          setLoanError("Livro indisponível para empréstimo");
+          return;
+        }
+
         setLoanError(mensagemServidor);
       } else {
         setLoanError("Erro ao realizar o empréstimo, tente novamente.");
@@ -96,11 +113,12 @@ export default function LivrosPage() {
     }
   };
 
+  // Deletes the selected book from the backend
   const deletarLivro = async () => {
     if (!livroSelecionado) return;
 
     try {
-      await axios.delete(`http://localhost:3001/livros/${livroSelecionado.id}`);
+      await api.delete(`/livros/${livroSelecionado.id}`);
 
       setLivros((livrosAtuais) =>
         livrosAtuais.filter((livro) => livro.id !== livroSelecionado.id),
@@ -148,12 +166,32 @@ export default function LivrosPage() {
                 setBookDetailId(livro.id);
                 setIsDetailModalOpen(true);
               }}
-              onBorrow={() => console.log(livro.id)}
+              onBorrow={() => {
+                setBookLoan(livro);
+                setLoanOpen(true);
+                setLoanError(null);
+              }}
               onDelete={() => setLivroSelecionado(livro)}
             />
           ))}
         </div>
       </div>
+
+      {/* MODAL DE EMPRÉSTIMO */}
+      <LoanModal
+        open={loanOpen}
+        onOpenChange={(isOpen) => {
+          setLoanOpen(isOpen);
+
+          if (!isOpen) {
+            setLoanError(null);
+            setBookLoan(null);
+          }
+        }}
+        bookTitle={livroLoan?.titulo ?? ""}
+        apiError={loanError}
+        onConfirm={handleConfirmarEmprestimo}
+      />
 
       {/* MODAL DE EXCLUSÃO */}
       {livroSelecionado && (
