@@ -7,7 +7,6 @@ import api from "@/services/api";
 import CategoryChart from "@/components/categoryChart";
 import { Badge } from "@/components/bagde";
 
-// Tipagem
 interface Livro {
   titulo: string;
 }
