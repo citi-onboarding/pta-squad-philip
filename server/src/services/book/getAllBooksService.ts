@@ -2,14 +2,17 @@ import Fuse from "fuse.js";
 import { Categoria } from "../../../generated/prisma";
 import { BookRepository } from "../../repositories/bookRepository";
 
-interface GetAllBooksDTO {
+interface GetAllBooksRequest {
   titulo?: string;
   categoria?: Categoria;
 }
 
 export class GetAllBooksService {
-  async execute({ titulo, categoria }: GetAllBooksDTO) {
-    const termo = titulo ? String(titulo).trim() : "";
+  async execute({
+    titulo,
+    categoria,
+  }: GetAllBooksRequest) {
+    const termo = titulo ? titulo.trim() : "";
 
     const livros = await BookRepository.getAll(categoria);
 
@@ -17,6 +20,7 @@ export class GetAllBooksService {
       return livros;
     }
 
+    // Applies fuzzy search by title and author
     const fuse = new Fuse(livros, {
       keys: ["titulo", "autor"],
       threshold: 0.4,

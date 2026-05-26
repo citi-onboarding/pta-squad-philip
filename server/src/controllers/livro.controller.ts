@@ -1,76 +1,30 @@
-import Fuse from "fuse.js";
 import { Request, Response } from "express";
-import prisma from "@database";
-import { Citi, Crud } from "../global";
+import { CreateBookService } from "src/services/book/createBookService";
+import { DeleteBookService } from "src/services/book/deleteBookSevice";
+import { AppError } from "../errors/AppError";
+import { GetByIdBookService } from "src/services/book/getBookByIdService";
+import { GetAllBooksService } from "src/services/book/getAllBooksService";
 
-class LivroController implements Crud {
-  constructor(private readonly citi = new Citi("Livro")) {}
-
+class LivroController {
   /**
    * Creates a new book from the request body.
    * Validates required fields and ISBN format before saving it.
    */
   create = async (request: Request, response: Response) => {
     try {
-      const {
-        titulo,
-        autor,
-        isbn,
-        editora,
-        ano,
-        quantidade_total,
-        categoria,
-      } = request.body;
+      const createBookService = new CreateBookService();
+      const livro = await createBookService.execute(request.body);
 
-      // Checks whether any required book field was not provided.
-      const valuesAreUndefined = this.citi.areValuesUndefined(
-        titulo,
-        autor,
-        isbn,
-        editora,
-        ano,
-        quantidade_total,
-        categoria
-      );
-
-      if (valuesAreUndefined) {
-        return response.status(400).send({
-          message: "Todos os campos são obrigatórios.",
-        });
-      }
-      // Normalizes the ISBN by counting only numeric digits.
-      const isbnDigitsLength = String(isbn).replace(/\D/g, "").length;
-
-      if (isbnDigitsLength !== 10 && isbnDigitsLength !== 13) {
-        return response.status(400).send({
-          message: "O ISBN deve possuir 10 ou 13 dígitos numéricos.",
-        });
-      }
-
-      // Sets the initial available quantity based on the total quantity.
-      const livroData = {
-          titulo,
-          autor,
-          isbn,
-          editora,
-          ano,
-          quantidade_total,
-          quantidade_disponivel: quantidade_total,
-          categoria,
-      };
-
-    const { httpStatus, message } = await this.citi.insertIntoDatabase(livroData);
-
-      return response.status(httpStatus).send({ message });
+      return response.status(201).send(livro);
+      
     } catch (error) {
-      // Logs unexpected errors and returns a generic server response.
+      if (error instanceof AppError) {
+        return response.status(error.statusCode).send({message: error.message});
+      }
       console.error(error);
-
-      return response.status(500).send({
-        message: "Erro interno ao cadastrar livro.",
-      });
+      return response.status(500).send({message: "Erro interno ao cadastrar livro."});
     }
-  };
+  }
 
   /**
    * Lists books using filters.
@@ -78,37 +32,19 @@ class LivroController implements Crud {
    */  
   getAll = async (request: Request, response: Response) => {
     try {
-      // Retrieves optional query filters from request params
-      const { titulo, categoria } = request.query;
+      const getAllBooksService = new GetAllBooksService();
 
-      const termo = titulo ? String(titulo).trim() : "";
-
-      // First filters by category in the database, if provided
-      const livros = await prisma.livro.findMany({
-        where: {
-          categoria: categoria ? String(categoria) : undefined,
-        },
+      const livros = await getAllBooksService.execute({
+        titulo: request.query.titulo
+          ? String(request.query.titulo)
+          : undefined,
+        categoria: request.query.categoria as Categoria | undefined,
       });
 
-      // If there is no search term, returns only the category-filtered result
-      if (!termo) {
-        return response.status(200).send(livros);
-      }
-
-      // Applies fuzzy search by title and author
-      const fuse = new Fuse(livros, {
-        keys: ["titulo", "autor"],
-        threshold: 0.4,
-        ignoreLocation: true,
-      });
-
-      const livrosFiltrados = fuse.search(termo).map((result) => result.item);
-
-      return response.status(200).send(livrosFiltrados);
+      return response.status(200).send(livros);
     } catch (error) {
       console.error(error);
 
-      // Handles unexpected internal server errors
       return response.status(500).send({
         message: "Erro interno ao listar livros.",
       });
@@ -124,19 +60,15 @@ class LivroController implements Crud {
       // The book ID is received through route parameters.
       const { id } = request.params;
 
-      const livro = await prisma.livro.findFirst({
-        where: { id },
-        include: { emprestimos: true },
-      });
-
-      if (!livro) {
-        return response.status(404).send({
-          message: "Livro não encontrado.",
-        });
-      }
+      const getByIdService = new GetByIdBookService();
+      const livro = await getByIdService.execute(id)
 
       return response.status(200).send(livro);
+      
     } catch (error) {
+      if (error instanceof AppError){
+        return response.status(error.statusCode).send({message: error.message,});
+      }
       // Logs unexpected errors and returns a generic server response.
       console.error(error);
 
@@ -154,18 +86,21 @@ class LivroController implements Crud {
       // The book ID is received through route parameters.
       const { id } = request.params;
 
-      const { httpStatus, messageFromDelete } = await this.citi.deleteValue(id);
+      const deleteBookService = new DeleteBookService();
+      await deleteBookService.execute(id)
 
-      return response.status(httpStatus).send({
-        message: messageFromDelete,
+      return response.status(200).send({
+        message: "Livro excluído com sucesso.",
       });
     } catch (error) {
       // Logs unexpected errors and returns a generic server response.
       console.error(error);
+      if (error instanceof AppError) {
+        return response.status(error.statusCode).send({message: error.message,});
+      }
 
-      return response.status(500).send({
-        message: "Erro interno ao excluir livro.",
-      });
+      console.error(error);
+      return response.status(500).send({message: "Erro interno ao deletar o livro."});
     }
   };
 }
