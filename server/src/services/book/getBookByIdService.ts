@@ -5,13 +5,13 @@ import { ValidationError } from "../../errors/validationError";
 export class GetByIdBookService {
   async execute(id: string) {
     if (!id) {
-      throw new ValidationError("ID do livro é obrigatório.");
+      throw new ValidationError("The book ID is required.");
     }
 
     const livro = await BookRepository.getById(id);
 
     if (!livro) {
-      throw new NotFoundError("Livro não encontrado.");
+      throw new NotFoundError("Book not found.");
     }
 
     return livro;

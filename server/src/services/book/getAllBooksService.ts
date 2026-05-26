@@ -4,7 +4,7 @@ import { BookRepository } from "../../repositories/bookRepository";
 
 interface GetAllBooksRequest {
   titulo?: string;
-  categoria?: Categoria;
+  categoria?: string;
 }
 
 export class GetAllBooksService {
@@ -14,7 +14,10 @@ export class GetAllBooksService {
   }: GetAllBooksRequest) {
     const termo = titulo ? titulo.trim() : "";
 
-    const livros = await BookRepository.getAll(categoria);
+    const livros = await BookRepository.getAll(
+
+      categoria as Categoria | undefined
+    );
 
     if (!termo) {
       return livros;
