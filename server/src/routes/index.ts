@@ -1,5 +1,5 @@
 import express from "express";
-import livroRoutes from "./livro.routes";
+import livroRoutes from "./book.routes";
 import emprestimoRoutes from "./emprestimo.routes";
 import dashboardRoutes from "./dashboard.routes";
 
