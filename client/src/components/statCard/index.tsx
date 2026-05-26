@@ -24,7 +24,7 @@ export function StatCard({typeCard, icon: Icon, value}: StatCardProps){
     }
 
     return (
-        <div className="flex gap-2 p-2 sm:p-3 lg:p-6 w-[110px] sm:w-[150px] md:w-[170px] lg:w-[240px] xl:w-[300px] 2xl:w-[381px] h-[87px] sm:h-[97px] md:h-[107px] bg-white rounded-lg shadow-md border-solid border-[0.83px] border-slate-200">
+        <div className="flex gap-2 p-2 sm:p-3 lg:p-6 w-full h-[87px] sm:h-[97px] md:h-[107px] bg-white rounded-lg shadow-md border-solid border-[0.83px] border-slate-200">
             <div className="flex items-center justify-center ">
                 <div className={`p-2 md:p-3 lg:p-4 rounded-xl ${typeCardStyles[typeCard]}`}>
                     <Icon className="w-3 h-3 lg:w-5 lg:h-5" />
