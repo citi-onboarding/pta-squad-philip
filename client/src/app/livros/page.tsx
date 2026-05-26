@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { useEffect } from "react";
+
 import { BookCard } from "@/components/bookCard";
 import BookFilters from "@/components/bookFilters";
+import { BookDetailModal } from "@/components/BookDetailModal/BookDetailModal";
 import { LoanModal } from "@/components/loanModal";
 
 interface Livro {
@@ -29,31 +30,94 @@ export default function LivrosPage() {
   const [livros, setLivros] = useState<Livro[]>([]);
   const [livroSelecionado, setLivroSelecionado] = useState<Livro | null>(null);
   const [deleteError, setDeleteError] = useState("");
+  const [bookDetailId, setBookDetailId] = useState<string | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
+  // --- ESTADOS ADICIONADOS/CORRIGIDOS PARA O EMPRÉSTIMO ---
   const [loanOpen, setLoanOpen] = useState(false);
-  const [livroLoan, setBookLoan] = useState<Livro | null>(null);
+  const [livroLoan, setLivroLoan] = useState<Livro | null>(null);
+  const [loanError, setLoanError] = useState<string | null>(null);
 
   const buscarLivros = async () => {
     const params: Record<string, string> = {};
-    if (search) params.titulo = search;
-    if (category) params.categoria = category;
 
-    const response = await axios.get("http://localhost:3001/livros", { params });
+    if (search) {
+      params.titulo = search;
+    }
+
+    if (category) {
+      params.categoria = category;
+    }
+
+    const response = await axios.get("http://localhost:3001/livros", {
+      params,
+    });
+
     setLivros(Array.isArray(response.data) ? response.data : []);
+  };
+
+  const handleConfirmarEmprestimo = async (data: {
+    nome_cliente: string;
+    email_cliente: string;
+    data_prevista_devolucao: string;
+  }) => {
+    if (!livroLoan) return;
+
+    try {
+      setLoanError(null);
+
+      const dataString = data.data_prevista_devolucao;
+      const dataObjeto = new Date(`${dataString}T12:00:00`);
+
+      await axios.post("http://localhost:3001/emprestimos", {
+        livro_id: String(livroLoan.id),
+        nome_cliente: data.nome_cliente,
+        email_cliente: data.email_cliente,
+        data_prevista_devolucao: dataObjeto,
+        data_locacao: new Date().toISOString(),
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      setLoanOpen(false);
+      setLivroLoan(null); // Corrigido de setBookLoan para setLivroLoan     
+      
+      buscarLivros();
+      
+    } catch (error: any) {
+      console.error("Erro ao criar empréstimo.", error);
+
+      if (error.response && error.response.data) {
+        const mensagemServidor = error.response.data.message || "Erro ao realizar empréstimo.";
+        setLoanError(mensagemServidor);
+      } else {
+        setLoanError("Erro ao realizar o empréstimo, tente novamente.");
+      }
+    }
   };
 
   const deletarLivro = async () => {
     if (!livroSelecionado) return;
 
     try {
-      await axios.delete(`http://localhost:3001/livros/${livroSelecionado.id}`);
-      setLivros((livrosAtuais) =>
-        livrosAtuais.filter((livro) => livro.id !== livroSelecionado.id)
+      await axios.delete(
+        `http://localhost:3001/livros/${livroSelecionado.id}`
       );
+
+      setLivros((livrosAtuais) =>
+        livrosAtuais.filter(
+          (livro) => livro.id !== livroSelecionado.id
+        )
+      );
+
       setLivroSelecionado(null);
       setDeleteError("");
     } catch (error) {
-      setDeleteError("Não foi possível excluir o livro. Tente novamente.");
+      setDeleteError(
+        "Não foi possível excluir o livro. Tente novamente."
+      );
     }
   };
 
@@ -66,6 +130,7 @@ export default function LivrosPage() {
       <div className="w-full max-w-[1100px] mx-auto px-[24px] pb-4">
         <div className="pt-4">
           <h1 className="font-medium text-[24px]">Livros</h1>
+
           <p className="text-[#717182] text-[16px]">
             Gerencie o acervo da biblioteca
           </p>
@@ -87,9 +152,13 @@ export default function LivrosPage() {
               category={livro.categoria}
               imageUrl={capas[livro.categoria]}
               availableQuantity={livro.quantidade_disponivel}
-              onView={() => console.log(livro.id)}
+              onView={() => {
+                setBookDetailId(livro.id);
+                setIsDetailModalOpen(true);
+              }}
+              // Ajustado para abrir o modal salvando o livro correto
               onBorrow={() => {
-                setBookLoan(livro);
+                setLivroLoan(livro);
                 setLoanOpen(true);
               }}
               onDelete={() => setLivroSelecionado(livro)}
@@ -100,21 +169,34 @@ export default function LivrosPage() {
 
       <LoanModal
         open={loanOpen}
-        onOpenChange={setLoanOpen}
+        onOpenChange={(isOpen) => {
+          setLoanOpen(isOpen);
+          if (!isOpen) {
+            setLoanError(null);
+            setLivroLoan(null); // Corrigido de setBookLoan para setLivroLoan
+          }
+        }}
         bookTitle={livroLoan?.titulo ?? ""}
+        apiError={loanError}
+        onConfirm={handleConfirmarEmprestimo}
       />
 
       {livroSelecionado && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
             <h2 className="text-lg font-semibold">Excluir livro</h2>
+
             <p className="mt-2 text-sm text-[#717182]">
               Tem certeza que deseja excluir o livro{" "}
               <strong>{livroSelecionado.titulo}</strong>?
             </p>
+
             {deleteError && (
-              <p className="mt-3 text-sm text-red-600">{deleteError}</p>
+              <p className="mt-3 text-sm text-red-600">
+                {deleteError}
+              </p>
             )}
+
             <div className="mt-6 flex justify-end gap-3">
               <button
                 type="button"
@@ -126,6 +208,7 @@ export default function LivrosPage() {
               >
                 Cancelar
               </button>
+
               <button
                 type="button"
                 onClick={deletarLivro}
@@ -137,6 +220,16 @@ export default function LivrosPage() {
           </div>
         </div>
       )}
+
+      {/* MODAL DE DETALHES */}
+      <BookDetailModal
+        id={bookDetailId || ""}
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setBookDetailId(null);
+        }}
+      />
     </div>
   );
 }
