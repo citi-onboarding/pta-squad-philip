@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '../bagde';
+import { useState, useEffect } from 'react';
+
 
 // Defines the props expected by the LoanHistoryCard component
 interface LoanHistoryCardProps {
@@ -33,20 +35,28 @@ export const LoanHistoryCard: React.FC<LoanHistoryCardProps> = ({
   const formatarData = (dataStr: string) => {
     return new Date(dataStr).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
   };
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   return (
-    <div style={styles.card}>
+    <div style={{
+      ...styles.card,
+      flexDirection: isMobile ? "column" : "row",
+      alignItems: isMobile ? "flex-start" : "center",
+    }}>
       {/* Left side content */}
       <div style={styles.leftContent}>
-        {/* Customer name and status badge */}
         <div style={styles.nameRow}>
           <span style={styles.name}>{nomeCliente}</span>
           <Badge status={(status === "Em_andamento" ? "Em andamento" : status) as any} text={statusFormatado} />
         </div>
-
-         {/* Customer email */}
         <p style={styles.email}>{emailCliente}</p>
-        {/* Rental and expected return dates */}
         <p style={styles.dates}>
           <span style={styles.dateLabel}>Locação: </span>
           <span style={styles.dateValue}>{formatarData(dataLocacao)}</span>
@@ -56,23 +66,19 @@ export const LoanHistoryCard: React.FC<LoanHistoryCardProps> = ({
       </div>
 
       {/* Right side action buttons */}
-      <div style={styles.rightActions}>
-        {/* Show reminder button only if the loan is overdue */}
+      <div style={{
+        ...styles.rightActions,
+        marginTop: isMobile ? "12px" : "0",
+        width: isMobile ? "100%" : "auto",
+        justifyContent: isMobile ? "flex-end" : "center",
+      }}>
         {status === "Atrasado" && (
-          <Button  
-            style={styles.btnReminder}
-            onClick={() => onEnviarLembrete(id)}
-          >
+          <Button style={styles.btnReminder} onClick={() => onEnviarLembrete(id)}>
             <span style={{ marginRight: '6px' }}>✉</span> Enviar Lembrete
           </Button>
         )}
-
-        {/* Show return button if the loan is active or overdue */}
         {(status === "Em_andamento" || status === "Atrasado") && (
-          <Button 
-            style={styles.btnReturn}
-            onClick={() => onDevolver(id)}
-          >
+          <Button style={styles.btnReturn} onClick={() => onDevolver(id)}>
             Devolvido
           </Button>
         )}

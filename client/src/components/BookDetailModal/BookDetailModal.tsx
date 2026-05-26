@@ -48,6 +48,15 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ id, isOpen, on
   // Controls loading state
   const [loading, setLoading] = useState<boolean>(false);
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+}, []);
+
   // Fetches book details when the modal opens
   useEffect(() => {
     if (isOpen && id) {
@@ -118,18 +127,27 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ id, isOpen, on
           <div style={styles.modalContent}>
             
             {/* Top section - Book information */}
-            <div style={styles.bookDetailsContainer}>
+            <div style={{
+              ...styles.bookDetailsContainer,
+              flexDirection: isMobile ? "column" : "row",
+              alignItems: isMobile ? "center" : "flex-start",
+            }}>
               {/* Book cover image */}
-              <div style={styles.coverBox}>
-                <img 
-                  src={capas[livro.categoria] || '/img/default.jpg'} 
-                  alt={livro.titulo} 
-                  style={styles.coverImg} 
+              <div style={{
+                ...styles.coverBox,
+                width: isMobile ? "100%" : "150px",
+                height: isMobile ? "220px" : "210px",
+                marginBottom: isMobile ? "20px" : "0",
+              }}>
+                <img
+                  src={capas[livro.categoria] || '/img/default.jpg'}
+                  alt={livro.titulo}
+                  style={styles.coverImg}
                 />
               </div>
 
               {/* Book information area */}              
-              <div style={styles.infoBox}>
+              <div style={{ ...styles.infoBox, width: isMobile ? "100%" : undefined }}>
                 <h2 style={styles.bookTitle}>{livro.titulo}</h2>
                 <p style={styles.bookAuthor}>{livro.autor}</p>
                 
