@@ -73,6 +73,7 @@ export default function LivrosPage() {
       setLoanError(null);
 
       const dataString = data.data_prevista_devolucao;
+
       const dataObjeto = new Date(`${dataString}T12:00:00`);
 
       await createLoan({
