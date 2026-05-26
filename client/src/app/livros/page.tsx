@@ -6,6 +6,7 @@ import axios from "axios";
 import { BookCard } from "@/components/bookCard";
 import BookFilters from "@/components/bookFilters";
 import { BookDetailModal } from "@/components/BookDetailModal/BookDetailModal";
+import { LoanModal } from "@/components/loanModal";
 
 interface Livro {
   id: string;
@@ -32,6 +33,9 @@ export default function LivrosPage() {
   const [bookDetailId, setBookDetailId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
+  // --- ESTADOS ADICIONADOS/CORRIGIDOS PARA O EMPRÉSTIMO ---
+  const [loanOpen, setLoanOpen] = useState(false);
+  const [livroLoan, setLivroLoan] = useState<Livro | null>(null);
   const [loanError, setLoanError] = useState<string | null>(null);
 
   const buscarLivros = async () => {
@@ -63,7 +67,6 @@ export default function LivrosPage() {
       setLoanError(null);
 
       const dataString = data.data_prevista_devolucao;
-
       const dataObjeto = new Date(`${dataString}T12:00:00`);
 
       await axios.post("http://localhost:3001/emprestimos", {
@@ -77,8 +80,9 @@ export default function LivrosPage() {
           'Content-Type': 'application/json'
         }
       });
+      
       setLoanOpen(false);
-      setBookLoan(null);     
+      setLivroLoan(null); // Corrigido de setBookLoan para setLivroLoan     
       
       buscarLivros();
       
@@ -152,7 +156,11 @@ export default function LivrosPage() {
                 setBookDetailId(livro.id);
                 setIsDetailModalOpen(true);
               }}
-              onBorrow={() => console.log(livro.id)}
+              // Ajustado para abrir o modal salvando o livro correto
+              onBorrow={() => {
+                setLivroLoan(livro);
+                setLoanOpen(true);
+              }}
               onDelete={() => setLivroSelecionado(livro)}
             />
           ))}
@@ -165,7 +173,7 @@ export default function LivrosPage() {
           setLoanOpen(isOpen);
           if (!isOpen) {
             setLoanError(null);
-            setBookLoan(null);
+            setLivroLoan(null); // Corrigido de setBookLoan para setLivroLoan
           }
         }}
         bookTitle={livroLoan?.titulo ?? ""}
