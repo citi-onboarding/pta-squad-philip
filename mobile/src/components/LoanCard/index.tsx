@@ -1,5 +1,11 @@
 import { CalendarDays } from "lucide-react-native";
-import { Image, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 interface LoanCardProps {
   tituloLivro: string;
@@ -37,20 +43,39 @@ export function LoanCard({
   dataPrevistaDevolucao,
   imagemLivro,
 }: LoanCardProps) {
+  const { width } = useWindowDimensions();
+
+  const isSmallScreen = width <= 360;
   const currentStatus = statusConfig[status];
+
+  const imageAreaWidth = isSmallScreen ? 58 : 80;
+  const bookImageWidth = isSmallScreen ? 48 : 64;
+  const bookImageHeight = isSmallScreen ? 72 : 96;
 
   return (
     <View style={styles.card}>
       <View style={styles.inner}>
-        <View style={styles.imageArea}>
+        <View style={[styles.imageArea, { width: imageAreaWidth }]}>
           {imagemLivro ? (
-            <Image source={{ uri: imagemLivro }} style={styles.bookImage} />
+            <Image
+              source={{ uri: imagemLivro }}
+              style={[
+                styles.bookImage,
+                {
+                  width: bookImageWidth,
+                  height: bookImageHeight,
+                },
+              ]}
+            />
           ) : null}
         </View>
 
         <View style={styles.content}>
           <View style={styles.header}>
-            <Text style={styles.title} numberOfLines={1}>
+            <Text
+              style={[styles.title, isSmallScreen && styles.titleSmall]}
+              numberOfLines={1}
+            >
               {tituloLivro}
             </Text>
 
@@ -64,7 +89,11 @@ export function LoanCard({
               ]}
             >
               <Text
-                style={[styles.badgeText, { color: currentStatus.textColor }]}
+                style={[
+                  styles.badgeText,
+                  { color: currentStatus.textColor },
+                  isSmallScreen && styles.badgeTextSmall,
+                ]}
               >
                 {currentStatus.label}
               </Text>
@@ -73,13 +102,21 @@ export function LoanCard({
 
           <View style={styles.dates}>
             <View style={styles.infoRow}>
-              <CalendarDays size={14} color="#6B7280" />
-              <Text style={styles.infoText}>Locação: {dataLocacao}</Text>
+              <CalendarDays size={isSmallScreen ? 13 : 14} color="#6B7280" />
+              <Text
+                style={[styles.infoText, isSmallScreen && styles.infoTextSmall]}
+                numberOfLines={1}
+              >
+                Locação: {dataLocacao}
+              </Text>
             </View>
 
             <View style={styles.infoRow}>
-              <CalendarDays size={14} color="#6B7280" />
-              <Text style={styles.infoText}>
+              <CalendarDays size={isSmallScreen ? 13 : 14} color="#6B7280" />
+              <Text
+                style={[styles.infoText, isSmallScreen && styles.infoTextSmall]}
+                numberOfLines={1}
+              >
                 Devolução: {dataPrevistaDevolucao}
               </Text>
             </View>
@@ -93,15 +130,15 @@ export function LoanCard({
 const styles = StyleSheet.create({
   card: {
     width: "100%",
-    height: 146,
+    minHeight: 146,
     backgroundColor: "#FFFFFF",
     borderRadius: 8,
     borderWidth: 0.83,
     borderColor: "#E5E7EB",
-    paddingTop: 16.82,
-    paddingRight: 16.82,
-    paddingBottom: 0.83,
-    paddingLeft: 16.82,
+    paddingTop: 16,
+    paddingRight: 16,
+    paddingBottom: 16,
+    paddingLeft: 16,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -114,32 +151,29 @@ const styles = StyleSheet.create({
 
   inner: {
     width: "100%",
-    height: 112,
     flexDirection: "row",
     gap: 12,
   },
 
   imageArea: {
-    width: 80,
-    height: 112,
+    justifyContent: "center",
+    alignItems: "flex-start",
   },
 
   bookImage: {
-    width: 80,
-    height: 112,
     borderRadius: 6,
     resizeMode: "cover",
   },
 
   content: {
-    width: 290,
-    height: 112,
+    flex: 1,
+    minWidth: 0,
     justifyContent: "space-between",
+    gap: 12,
   },
 
   header: {
-    width: 290,
-    height: 59,
+    gap: 8,
   },
 
   title: {
@@ -147,7 +181,12 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     fontWeight: "500",
     color: "#222222",
-    marginBottom: 8,
+    flexShrink: 1,
+  },
+
+  titleSmall: {
+    fontSize: 20,
+    lineHeight: 24,
   },
 
   badge: {
@@ -164,9 +203,12 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
 
+  badgeTextSmall: {
+    fontSize: 13,
+    lineHeight: 17,
+  },
+
   dates: {
-    width: 290,
-    height: 44,
     gap: 4,
   },
 
@@ -174,12 +216,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    height: 20,
   },
 
   infoText: {
     fontSize: 16,
     lineHeight: 20,
     color: "#6B7280",
+    flexShrink: 1,
+  },
+
+  infoTextSmall: {
+    fontSize: 14,
+    lineHeight: 18,
   },
 });
