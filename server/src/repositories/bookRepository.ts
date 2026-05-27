@@ -1,5 +1,5 @@
 import prisma from "../database";
-import {Prisma, Categoria, Livro} from "../../generated/prisma";
+import {Prisma, Categoria, Livro, Emprestimo} from "../../generated/prisma";
 
 export const BookRepository = {
     create: async (data: Prisma.LivroCreateInput): Promise <Livro> => {
@@ -12,9 +12,12 @@ export const BookRepository = {
         });
     },
 
-    getById: async (id: string): Promise <Livro | null> => {
+    getById: async (id: string): Promise <Livro & { emprestimos: Emprestimo[] } | null> => {
         return prisma.livro.findUnique({
             where: {id},
+            include: {
+                emprestimos: true,
+            }
         });
     },
 

@@ -1,7 +1,7 @@
 // src/services/CreateBookService.ts
 
 import { BookRepository } from "../../repositories/bookRepository";
-import { CreateBookDTO } from "../../dtos/createBookDTO";
+import { CreateBookDTO } from "../../dtos/book/createBookDTO";
 import { ValidationError } from "../../errors/validationError";
 import { ConflictError } from "../../errors/conflictError";
 
