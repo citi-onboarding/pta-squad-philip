@@ -240,6 +240,7 @@ export default function LivrosPage() {
           setIsDetailModalOpen(false);
           setBookDetailId(null);
         }}
+        onReturnSuccess={buscarLivros}
       />
     </div>
   );

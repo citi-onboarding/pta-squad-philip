@@ -21,6 +21,7 @@ interface BookDetailModalProps {
   id: string; // Book id used to fetch details
   isOpen: boolean; // Controls whether the modal is open or closed
   onClose: () => void; // Function called when closing the modal
+  onReturnSuccess?: () => void;
 }
 
 // Book details modal component
@@ -28,6 +29,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   id,
   isOpen,
   onClose,
+  onReturnSuccess,
 }) => {
   // Stores fetched book data
   const [livro, setLivro] = useState<BookDetails | null>(null);
@@ -120,6 +122,8 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
       );
 
       await buscarLivro();
+
+      await onReturnSuccess?.();
     } catch (error) {
       console.error("Erro ao marcar como devolvido:", error);
       alert("Falha ao marcar o livro como devolvido.");
