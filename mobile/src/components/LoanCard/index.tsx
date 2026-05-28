@@ -9,10 +9,11 @@ import {
 
 interface LoanCardProps {
   tituloLivro: string;
+  nomeCliente: string;
   status: "Em_andamento" | "Devolvido" | "Atrasado";
   dataLocacao: string;
   dataPrevistaDevolucao: string;
-  imagemLivro?: string;
+  imagemLivro: string;
 }
 
 const statusConfig = {
@@ -38,6 +39,7 @@ const statusConfig = {
 
 export function LoanCard({
   tituloLivro,
+  nomeCliente,
   status,
   dataLocacao,
   dataPrevistaDevolucao,
@@ -48,26 +50,24 @@ export function LoanCard({
   const isSmallScreen = width <= 360;
   const currentStatus = statusConfig[status];
 
-  const imageAreaWidth = isSmallScreen ? 58 : 80;
-  const bookImageWidth = isSmallScreen ? 48 : 64;
-  const bookImageHeight = isSmallScreen ? 72 : 96;
+  const imageAreaWidth = isSmallScreen ? 60 : 76;
+  const imageWidth = isSmallScreen ? 52 : 64;
+  const imageHeight = isSmallScreen ? 78 : 96;
 
   return (
     <View style={styles.card}>
       <View style={styles.inner}>
         <View style={[styles.imageArea, { width: imageAreaWidth }]}>
-          {imagemLivro ? (
-            <Image
-              source={{ uri: imagemLivro }}
-              style={[
-                styles.bookImage,
-                {
-                  width: bookImageWidth,
-                  height: bookImageHeight,
-                },
-              ]}
-            />
-          ) : null}
+          <Image
+            source={{ uri: imagemLivro }}
+            style={[
+              styles.bookImage,
+              {
+                width: imageWidth,
+                height: imageHeight,
+              },
+            ]}
+          />
         </View>
 
         <View style={styles.content}>
@@ -77,6 +77,16 @@ export function LoanCard({
               numberOfLines={1}
             >
               {tituloLivro}
+            </Text>
+
+            <Text
+              style={[
+                styles.clientName,
+                isSmallScreen && styles.clientNameSmall,
+              ]}
+              numberOfLines={1}
+            >
+              {nomeCliente}
             </Text>
 
             <View
@@ -135,10 +145,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 0.83,
     borderColor: "#E5E7EB",
-    paddingTop: 16,
-    paddingRight: 16,
-    paddingBottom: 16,
-    paddingLeft: 16,
+    padding: 16,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -163,49 +170,62 @@ const styles = StyleSheet.create({
   bookImage: {
     borderRadius: 6,
     resizeMode: "cover",
+    backgroundColor: "#E5E7EB",
   },
 
   content: {
     flex: 1,
     minWidth: 0,
     justifyContent: "space-between",
-    gap: 12,
+    gap: 10,
   },
 
   header: {
-    gap: 8,
+    gap: 4,
   },
 
   title: {
-    fontSize: 22,
-    lineHeight: 26,
+    fontSize: 20,
+    lineHeight: 24,
     fontWeight: "500",
     color: "#222222",
     flexShrink: 1,
   },
 
   titleSmall: {
-    fontSize: 20,
-    lineHeight: 24,
+    fontSize: 18,
+    lineHeight: 22,
+  },
+
+  clientName: {
+    fontSize: 14,
+    lineHeight: 18,
+    color: "#6B7280",
+    flexShrink: 1,
+  },
+
+  clientNameSmall: {
+    fontSize: 12,
+    lineHeight: 16,
   },
 
   badge: {
     alignSelf: "flex-start",
     borderWidth: 1,
     borderRadius: 999,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
+    paddingVertical: 3,
+    paddingHorizontal: 10,
   },
 
   badgeText: {
-    fontSize: 14,
-    lineHeight: 18,
+    fontSize: 13,
+    lineHeight: 17,
     fontWeight: "500",
   },
 
   badgeTextSmall: {
-    fontSize: 13,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
   },
 
   dates: {
@@ -219,14 +239,14 @@ const styles = StyleSheet.create({
   },
 
   infoText: {
-    fontSize: 16,
-    lineHeight: 20,
+    fontSize: 14,
+    lineHeight: 18,
     color: "#6B7280",
     flexShrink: 1,
   },
 
   infoTextSmall: {
-    fontSize: 14,
-    lineHeight: 18,
+    fontSize: 13,
+    lineHeight: 17,
   },
 });
