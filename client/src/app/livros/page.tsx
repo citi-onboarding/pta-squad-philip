@@ -80,7 +80,7 @@ export default function LivrosPage() {
         livro_id: String(livroLoan.id),
         nome_cliente: data.nome_cliente,
         email_cliente: data.email_cliente,
-        data_prevista_devolucao: dataObjeto,
+        data_prevista_devolucao: dataObjeto.toLocaleDateString('sv-SE'),
         data_locacao: new Date().toISOString(),
       });
 
