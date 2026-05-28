@@ -43,9 +43,11 @@ interface LoanModalProps {
   open: boolean
   onOpenChange: (isOpen: boolean) => void
   bookTitle: string
+  apiError: string | null;
+  onConfirm: (data: { nome_cliente: string; email_cliente: string; data_prevista_devolucao: string }) => Promise<void>;
 }
 
-export function LoanModal({ open, onOpenChange, bookTitle }: LoanModalProps) {
+export function LoanModal({ open, onOpenChange, bookTitle, apiError, onConfirm }: LoanModalProps) {
   
   const [formData, setFormData] = useState<LoanFormData>({
     clientName: "",
@@ -97,7 +99,7 @@ export function LoanModal({ open, onOpenChange, bookTitle }: LoanModalProps) {
     setErrors(newErrors)
   }
 
-  const submitLoan = (e: React.FormEvent<HTMLFormElement>) => {
+  const submitLoan = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const newErrors: LoanFormErrors = {}
@@ -122,9 +124,11 @@ export function LoanModal({ open, onOpenChange, bookTitle }: LoanModalProps) {
       setErrors(newErrors)
       return
     }
-
-    console.log(formData)
-    handleClose()
+    await onConfirm({
+      nome_cliente: formData.clientName,
+      email_cliente: formData.clientEmail,
+      data_prevista_devolucao: formData.returnDate,
+      })
   }
 
   const handleClose = () => {
@@ -210,6 +214,12 @@ export function LoanModal({ open, onOpenChange, bookTitle }: LoanModalProps) {
               </Field>
 
               <Separator />
+              {apiError && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm font-medium w-full">
+                  {apiError}
+                </div>
+              )}
+              <div className="flex w-full justify-center items-center gap-2 pb-4"></div>
               <div className="flex w-full justify-center items-center gap-2 pb-4">
                 <Button onClick={handleClose} type="button" className="bg-white border border-solid border-[#00C389] rounded-lg text-[#00C389] text-lg">Cancelar</Button>
                 <Button type="submit" className="bg-[#00C389] border border-solid rounded-lg text-white text-lg">Confirmar Empréstimo</Button>
@@ -222,87 +232,109 @@ export function LoanModal({ open, onOpenChange, bookTitle }: LoanModalProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogOverlay className="backdrop-blur-sm bg-black/20" />
-      <DialogContent className="max-w-[393px] [&>button]:hidden">
-        <DialogHeader className="flex justify-between">
-          <DialogTitle className="text-2xl flex justify-between">Realizar empréstimo
-            <DialogClose className="p-2 hover:bg-[#f0f0f0] hover:duration-200 rounded-lg">
-              <X className="w-5 h-5 text-[#717182]" />
-            </DialogClose>
-          </DialogTitle>
-        </DialogHeader>
+  <Dialog open={open} onOpenChange={handleClose}>
+    <DialogOverlay className="backdrop-blur-sm bg-black/20" />
+    <DialogContent className="max-w-[393px] [&>button]:hidden">
+      <DialogHeader className="flex justify-between">
+        <DialogTitle className="text-2xl flex justify-between">
+          Realizar empréstimo
+          <DialogClose className="p-2 hover:bg-[#f0f0f0] hover:duration-200 rounded-lg">
+            <X className="w-5 h-5 text-[#717182]" />
+          </DialogClose>
+        </DialogTitle>
+      </DialogHeader>
+
+      <Separator />
+
+      <div className="bg-[#F7F9FA] flex flex-col items-start justify-center p-6 rounded-lg mb-2">
+        <p className="text-[#717182] text-sm">Livro selecionado:</p>
+        <span className="text-[#1E1E1E] text-md">{bookTitle}</span>
+      </div>
+
+      <form onSubmit={submitLoan} className="flex flex-col gap-4">
+        <Field>
+          <FieldLabel>Nome do Cliente</FieldLabel>
+          <Input
+            className="h-12"
+            type="text"
+            placeholder="Digite o nome do cliente"
+            value={formData.clientName}
+            onChange={(e) => {
+              setFormData({ ...formData, clientName: e.target.value });
+              validateField("clientName", e.target.value);
+            }}
+          />
+          <FieldError>{errors.clientName}</FieldError>
+        </Field>
+
+        <Field>
+          <FieldLabel>Email do Cliente</FieldLabel>
+          <Input
+            className="h-12"
+            type="text"
+            placeholder="Digite o email do cliente"
+            value={formData.clientEmail}
+            onChange={(e) => {
+              setFormData({ ...formData, clientEmail: e.target.value });
+              validateField("clientEmail", e.target.value);
+            }}
+          />
+          <FieldError>{errors.clientEmail}</FieldError>
+        </Field>
+
+        <Field>
+          <FieldLabel>Data da Locação</FieldLabel>
+          <Input
+            className="h-12 text-[#9CA3AF]"
+            type="date"
+            value={formData.loanDate}
+            onChange={(e) => {
+              setFormData({ ...formData, loanDate: e.target.value });
+              validateField("loanDate", e.target.value);
+            }}
+          />
+          <FieldError>{errors.loanDate}</FieldError>
+        </Field>
+
+        <Field>
+          <FieldLabel>Data da Devolução</FieldLabel>
+          <Input
+            className="h-12 text-[#9CA3AF]"
+            type="date"
+            value={formData.returnDate}
+            onChange={(e) => {
+              setFormData({ ...formData, returnDate: e.target.value });
+              validateField("returnDate", e.target.value);
+            }}
+          />
+          <FieldError>{errors.returnDate}</FieldError>
+        </Field>
+
         <Separator />
-        <div className="bg-[#F7F9FA] flex flex-col items-start justify-center p-6 rounded-lg mb-2">
-          <p className="text-[#717182] text-sm">Livro selecionado:</p>
-          <span className="text-[#1E1E1E] text-md">{bookTitle}</span>
-        </div>
 
-        <form onSubmit={submitLoan} className="flex flex-col gap-4">
-          <Field>
-            <FieldLabel>Nome do Cliente</FieldLabel>
-            <Input
-              className="h-12"
-              type="text"
-              placeholder="Digite o nome do cliente"
-              value={formData.clientName}
-              onChange={(e) => {
-                setFormData({ ...formData, clientName: e.target.value })
-                validateField("clientName", e.target.value)
-              }}
-            />
-            <FieldError>{errors.clientName}</FieldError>
-          </Field>
-
-          <Field>
-            <FieldLabel>Email do Cliente</FieldLabel>
-            <Input
-              className="h-12"
-              type="text"
-              placeholder="Digite o email do cliente"
-              value={formData.clientEmail}
-              onChange={(e) => {
-                setFormData({ ...formData, clientEmail: e.target.value })
-                validateField("clientEmail", e.target.value)
-              }}
-            />
-            <FieldError>{errors.clientEmail}</FieldError>
-          </Field>
-
-          <Field>
-            <FieldLabel>Data da Locação</FieldLabel>
-            <Input
-              className="h-12 text-[#9CA3AF] [&:not(:focus):not([value])]:text-[#9CA3AF]"
-              type="date"
-              value={formData.loanDate}
-              onChange={(e) => {
-                setFormData({ ...formData, loanDate: e.target.value })
-                validateField("loanDate", e.target.value)
-              }}
-            />
-            <FieldError>{errors.loanDate}</FieldError>
-          </Field>
-
-          <Field>
-            <FieldLabel>Data da Devolução</FieldLabel>
-            <Input
-              className="h-12 text-[#9CA3AF] [&:not(:focus):not([value])]:text-[#9CA3AF]"
-              type="date"
-              value={formData.returnDate}
-              onChange={(e) => {
-                setFormData({ ...formData, returnDate: e.target.value })
-                validateField("returnDate", e.target.value)
-              }}
-            />
-            <FieldError>{errors.returnDate}</FieldError>
-          </Field>
-          <Separator />
-          <div className="flex w-full justify-center items-center gap-2">
-            <Button onClick={handleClose} type="button" className="bg-white border border-solid border-[#00C389] rounded-lg text-[#00C389] text-lg">Cancelar</Button>
-            <Button type="submit" className="bg-[#00C389] border border-solid rounded-lg text-white text-lg">Confirmar Empréstimo</Button>
+        {apiError && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm font-medium w-full">
+            {apiError}
           </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
-}
+        )}
+
+        <div className="flex w-full justify-center items-center gap-2">
+          <Button
+            onClick={handleClose}
+            type="button"
+            className="bg-white border border-solid border-slate-200 text-black"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            className="bg-[#00C389] border border-solid rounded-lg text-white font-medium"
+          >
+            Confirmar Empréstimo
+          </Button>
+        </div>
+      </form>
+
+    </DialogContent>
+  </Dialog>
+);}
