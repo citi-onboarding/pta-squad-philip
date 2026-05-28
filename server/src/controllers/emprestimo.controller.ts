@@ -5,6 +5,7 @@ import {
   enviarConfirmacaoDevolucao,
   enviarLembrete,
 } from "../services/email.services";
+import { atualizarEmprestimosAtrasados } from "src/services/emprestimo.service";
 
 class EmprestimoController implements Crud {
   constructor(private readonly citi = new Citi("Emprestimo")) {}
@@ -14,11 +15,12 @@ class EmprestimoController implements Crud {
    * Validates required fields, checks book availability, and updates the stock.
    */
 
-  /**  Swapped the order from async create to create = async to guarantee "this" scope
-   *   and avoid silent bugs.
+  /**
+   * Swapped the order from async create to create = async to guarantee "this" scope
+   * and avoid silent bugs.
    */
   create = async (request: Request, response: Response) => {
-    // Added try/catch block to isolate errors and prevent the server from crashing
+    // Added try/catch block to isolate errors and prevent the server from crashing.
     try {
       const {
         livro_id,
@@ -54,20 +56,20 @@ class EmprestimoController implements Crud {
           .send({ message: "Livro não encontrado no estoque." });
       }
 
-      // Decrements the available stock count of the borrowed book by 1
+      // Decrements the available stock count of the borrowed book by 1.
       await prisma.livro.update({
         where: { id: livro_id },
         data: { quantidade_disponivel: livro.quantidade_disponivel - 1 },
       });
 
       // Saves the new loan record into the database with initial active status.
-      // Now uses prisma for strong typing
+      // Now uses prisma for strong typing.
       const novoEmprestimo = await prisma.emprestimo.create({
         data: {
           livro_id,
           nome_cliente,
           email_cliente,
-          data_locacao: new Date(data_locacao), // Strings into new Date () so the database reads them formatted as actual date types.
+          data_locacao: new Date(data_locacao),
           data_prevista_devolucao: new Date(data_prevista_devolucao),
           status: "Em_andamento",
         },
@@ -88,54 +90,51 @@ class EmprestimoController implements Crud {
    * Processes a book return or loan removal using the ID received from route parameters.
    * Restores the book stock availability count by incrementing it by 1.
    */
-  // Swapped the order just like in 'create'
+  // Swapped the order just like in 'create'.
   delete = async (request: Request, response: Response) => {
-    const { id } = request.params;
+    try {
+      const { id } = request.params;
 
-    // Finds the target loan record to check its existence and linked book.
-    const emprestimo = await prisma.emprestimo.findUnique({
-      where: { id },
-    });
+      // Finds the target loan record to check its existence and linked book.
+      const emprestimo = await prisma.emprestimo.findUnique({
+        where: { id },
+      });
 
-    if (!emprestimo) {
+      if (!emprestimo) {
+        return response
+          .status(404)
+          .send({ message: "Empréstimo não encontrado." });
+      }
+
+      // Increments the available stock count of the returned book by 1.
+      await prisma.livro.update({
+        where: { id: emprestimo.livro_id },
+        data: { quantidade_disponivel: { increment: 1 } },
+      });
+
+      // Removes the loan record from the database.
+      await this.citi.deleteValue(id);
+
       return response
-        .status(404)
-        .send({ message: "Empréstimo não encontrado." });
+        .status(200)
+        .send({ message: "Empréstimo deletado com sucesso." });
+    } catch (error) {
+      console.error(error);
+
+      return response.status(500).send({
+        message: "Erro interno ao deletar empréstimo.",
+      });
     }
-
-    // Increments the available stock count of the returned book by 1.
-    await prisma.livro.update({
-      where: { id: emprestimo.livro_id },
-      data: { quantidade_disponivel: { increment: 1 } },
-    });
-
-    // Removes the loan record from the database.
-    await this.citi.deleteValue(id);
-
-    return response
-      .status(200)
-      .send({ message: "Empréstimo deletado com sucesso." });
   };
 
   /**
    * Lists all loans and calculates their real-time delay status.
    */
-  // Swapped the order just like in 'create' and 'delete'
+  // Swapped the order just like in 'create' and 'delete'.
   getAll = async (request: Request, response: Response) => {
     try {
-      const hoje = new Date();
-
-      await prisma.emprestimo.updateMany({
-        where: {
-          status: "Em_andamento",
-          data_prevista_devolucao: {
-            lt: hoje,
-          },
-        },
-        data: {
-          status: "Atrasado",
-        },
-      });
+      // Updates overdue loans before returning loan records.
+      await atualizarEmprestimosAtrasados();
 
       const emprestimos = await prisma.emprestimo.findMany();
 
@@ -153,11 +152,14 @@ class EmprestimoController implements Crud {
    * Retrieves loan records filtered by the client's name.
    * Includes the related book model details in the response.
    */
-  // Swapped the order like 'create', 'delete' and 'getAll'
+  // Swapped the order like 'create', 'delete' and 'getAll'.
   getByClienteNome = async (request: Request, response: Response) => {
-    // Added try/catch block to isolate errors and prevent the server from crashing
+    // Added try/catch block to isolate errors and prevent the server from crashing.
     try {
       const { nome } = request.query;
+
+      // Updates overdue loans before searching by client name.
+      await atualizarEmprestimosAtrasados();
 
       const emprestimos = await prisma.emprestimo.findMany({
         where: {
@@ -169,26 +171,14 @@ class EmprestimoController implements Crud {
         include: { livro: true },
       });
 
-      // Captures the exact moment/date when the search request happens.
-      const hoje = new Date();
-
-      /** Maps through the results to update and refresh loan statuses in real-time
-       * whenever someone looks up a client.
-       */
-      const emprestimosAtualizados = emprestimos.map((emp) => ({
-        ...emp,
-        status:
-          emp.status !== "Devolvido" &&
-          hoje > new Date(emp.data_prevista_devolucao)
-            ? "Atrasado"
-            : emp.status,
-      }));
-
-      return response.status(200).send(emprestimosAtualizados);
+      return response.status(200).send(emprestimos);
     } catch (error) {
       // Catch block handling to print the error trace and respond with a generic 500 code.
       console.error(error);
-      return response.status(500).send({ message: "Erro interno ao buscar." });
+
+      return response.status(500).send({
+        message: "Erro interno ao buscar.",
+      });
     }
   };
 
@@ -196,6 +186,9 @@ class EmprestimoController implements Crud {
   sendReminder = async (request: Request, response: Response) => {
     try {
       const { id } = request.params;
+
+      // Updates overdue loans before validating whether the reminder can be sent.
+      await atualizarEmprestimosAtrasados();
 
       const emprestimo = await prisma.emprestimo.findUnique({
         where: { id },
@@ -239,6 +232,9 @@ class EmprestimoController implements Crud {
     try {
       const { id } = request.params;
 
+      // Updates overdue loans before validating whether the loan can be returned.
+      await atualizarEmprestimosAtrasados();
+
       const emprestimo = await prisma.emprestimo.findUnique({
         where: { id },
         include: { livro: true },
@@ -261,10 +257,13 @@ class EmprestimoController implements Crud {
       }
 
       // Business rule: returning a book must update the loan status and restore book stock together.
-      const [emprestimosAtualizados] = await prisma.$transaction([
+      const [emprestimoAtualizado] = await prisma.$transaction([
         prisma.emprestimo.update({
           where: { id },
-          data: { status: "Devolvido", data_devolucao_real: new Date() },
+          data: {
+            status: "Devolvido",
+            data_devolucao_real: new Date(),
+          },
           include: { livro: true },
         }),
 
@@ -287,7 +286,7 @@ class EmprestimoController implements Crud {
 
       return response.status(200).send({
         message: "Livro devolvido com sucesso.",
-        emprestimo: emprestimosAtualizados,
+        emprestimo: emprestimoAtualizado,
       });
     } catch (error) {
       console.error("Erro real ao devolver livro:", error);
