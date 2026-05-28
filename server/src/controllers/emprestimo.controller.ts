@@ -5,7 +5,7 @@ import {
   enviarConfirmacaoDevolucao,
   enviarLembrete,
 } from "../services/email.services";
-import { atualizarEmprestimosAtrasados } from "src/services/emprestimo.service";
+import { atualizarEmprestimosAtrasados } from "src/services/loan/emprestimo.service";
 
 class EmprestimoController implements Crud {
   constructor(private readonly citi = new Citi("Emprestimo")) {}

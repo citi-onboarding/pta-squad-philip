@@ -1,6 +1,7 @@
 import Fuse from "fuse.js";
 import { Categoria } from "../../../generated/prisma";
 import { BookRepository } from "../../repositories/bookRepository";
+import { atualizarEmprestimosAtrasados } from "../loan/emprestimo.service"; 
 
 interface GetAllBooksRequest {
   titulo?: string;
@@ -12,6 +13,8 @@ export class GetAllBooksService {
     titulo,
     categoria,
   }: GetAllBooksRequest) {
+    await atualizarEmprestimosAtrasados();
+
     const termo = titulo ? titulo.trim() : "";
 
     const livros = await BookRepository.getAll(
