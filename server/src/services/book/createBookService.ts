@@ -28,13 +28,13 @@ export class CreateBookService {
     ];
 
     if (requiredFields.some((field) => field === undefined)) {
-      throw new ValidationError("All fields are required.");
+      throw new ValidationError("Todos os campos são obrigatórios.");
     }
 
     const isbnDigitsLength = String(isbn).replace(/\D/g, "").length;
 
     if (isbnDigitsLength !== 10 && isbnDigitsLength !== 13) {
-      throw new ValidationError("The ISBN must contain 10 or 13 numeric digits.");
+      throw new ValidationError("O ISBN deve conter 10 ou 13 dígitos numéricos.");
     }
 
     try {
@@ -52,7 +52,7 @@ export class CreateBookService {
       return livro;
     } catch (error: any) {
       if (error.code === "P2002") {
-        throw new ConflictError("A book with this ISBN already exists.");
+        throw new ConflictError("Já existe um livro com este ISBN.");
       }
 
       throw error;

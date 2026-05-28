@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { CreateBookService } from "src/services/book/createBookService";
-import { DeleteBookService } from "src/services/book/deleteBookSevice";
-import { GetByIdBookService } from "src/services/book/getBookByIdService";
-import { GetAllBooksService } from "src/services/book/getAllBooksService";
+import { CreateBookService } from "../services/book/createBookService";
+import { DeleteBookService } from "../services/book/deleteBookService";
+import { GetByIdBookService } from "../services/book/getBookByIdService";
+import { GetAllBooksService } from "../services/book/getAllBooksService";
 
 class LivroController {
 
@@ -60,7 +60,7 @@ class LivroController {
       await deleteBookService.execute(id)
 
       return response.status(200).send({
-        message: "Book deleted successfully.",
+        message: "Livro excluído com sucesso.",
       });
     } catch (error) {
       next(error);

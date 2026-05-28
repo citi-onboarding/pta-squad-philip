@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import "@database";
-import { iniciarEnvioAutomaticoDeLembretes } from "src/jobs/enviarLembretesAtrasados.job";
+import { iniciarEnvioAutomaticoDeLembretes } from "./jobs/enviarLembretesAtrasados.job";
 import { errorHandler } from "./middlewares/errorHandler";
 
 dotenv.config();

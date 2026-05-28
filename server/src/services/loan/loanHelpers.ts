@@ -1,6 +1,5 @@
 import prisma from "@database";
 
-// Updates all active loans whose expected return date has already passed.
 export async function atualizarEmprestimosAtrasados() {
   const hoje = new Date();
 

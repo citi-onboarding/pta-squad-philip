@@ -1,7 +1,7 @@
 import Fuse from "fuse.js";
 import { Categoria } from "../../../generated/prisma";
 import { BookRepository } from "../../repositories/bookRepository";
-import { atualizarEmprestimosAtrasados } from "../loan/emprestimo.service"; 
+import { atualizarEmprestimosAtrasados } from "../loan/loanHelpers";
 
 interface GetAllBooksRequest {
   titulo?: string;
