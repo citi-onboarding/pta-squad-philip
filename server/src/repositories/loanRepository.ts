@@ -1,6 +1,5 @@
 import prisma from "../database";
 import { Emprestimo, Livro } from "../../generated/prisma";
-import { CreateLoanDTO } from "../dtos/loan/createLoanDTO";
 
 type LoanWithLivro = Emprestimo & { livro: Livro };
 
@@ -78,6 +77,20 @@ export const EmprestimoRepository = {
         },
       },
       include: { livro: true },
+    });
+  },
+
+  updateOverdueLoans: async (): Promise<void> => {
+    await prisma.emprestimo.updateMany({
+      where: {
+        status: "Em_andamento",
+        data_prevista_devolucao: {
+          lt: new Date(),
+        },
+      },
+      data: {
+        status: "Atrasado",
+      },
     });
   },
 

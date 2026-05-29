@@ -3,7 +3,6 @@ import { CreateLoanDTO } from "../../dtos/loan/createLoanDTO";
 import { EmprestimoRepository } from "../../repositories/loanRepository";
 import { NotFoundError } from "../../errors/notFoundError";
 import { ValidationError } from "../../errors/validationError";
-import { atualizarEmprestimosAtrasados } from "./loanHelpers";
 
 export class EmprestimoService {
   async create(data: CreateLoanDTO) {
@@ -16,12 +15,12 @@ export class EmprestimoService {
     } = data;
 
     const requiredFields = [
-          livro_id,
-          nome_cliente,
-          email_cliente,
-          data_locacao,
-          data_prevista_devolucao,
-        ];
+      livro_id,
+      nome_cliente,
+      email_cliente,
+      data_locacao,
+      data_prevista_devolucao,
+    ];
 
     if (requiredFields.some((field) => !field)) {
       throw new ValidationError("Todos os campos precisam ser preenchidos.");
@@ -61,19 +60,19 @@ export class EmprestimoService {
   }
 
   async getAll() {
-    await atualizarEmprestimosAtrasados();
+    await EmprestimoRepository.updateOverdueLoans();
 
     return EmprestimoRepository.getAll();
   }
 
   async getByClienteNome(nome: string) {
-    await atualizarEmprestimosAtrasados();
+    await EmprestimoRepository.updateOverdueLoans();
 
     return EmprestimoRepository.getByClienteNome(nome);
   }
 
   async sendReminder(id: string) {
-    await atualizarEmprestimosAtrasados();
+    await EmprestimoRepository.updateOverdueLoans();
 
     const emprestimo = await EmprestimoRepository.getByIdWithBook(id);
 
@@ -98,7 +97,7 @@ export class EmprestimoService {
   }
 
   async returnBook(id: string) {
-    await atualizarEmprestimosAtrasados();
+    await EmprestimoRepository.updateOverdueLoans();
 
     const emprestimo = await EmprestimoRepository.getByIdWithBook(id);
 
