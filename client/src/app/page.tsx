@@ -58,6 +58,9 @@ const defaultState: DashboardData = {
   ultimosEmprestimos: [],
 };
 
+const normalize = (str: string) =>
+  str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
 export default function Home() {
   const [data, setData] = useState<DashboardData>(defaultState);
 
@@ -79,7 +82,7 @@ export default function Home() {
 
   const livrosPorCategoriaCompleto = todasCategorias.map((categoria) => {
     const encontrado = data.livrosPorCategoria.find(
-      (item) => item.categoria === categoria,
+      (item) => normalize(item.categoria) === normalize(categoria)
     );
     return { categoria, quantidade: encontrado?.quantidade ?? 0 };
   });
