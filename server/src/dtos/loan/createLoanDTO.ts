@@ -1,4 +1,4 @@
-export interface CreateEmprestimoDTO {
+export interface CreateLoanDTO {
   livro_id: string;
   nome_cliente: string;
   email_cliente: string;

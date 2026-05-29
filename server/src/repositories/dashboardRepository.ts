@@ -1,6 +1,4 @@
 import prisma from "../database";
-import { Categoria } from "../../generated/prisma";
-import { LivrosPorCategoriaRawDTO } from "../dtos/dashboard/dashboardDTO";
 
 export const DashboardRepository = {
   countActiveLoans: async (): Promise<number> => {
@@ -15,7 +13,7 @@ export const DashboardRepository = {
     });
   },
 
-  getBooksByCategory: async (): Promise<LivrosPorCategoriaRawDTO[]> => {
+  getBooksByCategory: async () => {
     return prisma.livro.groupBy({
       by: ["categoria"],
       _sum: { quantidade_total: true },

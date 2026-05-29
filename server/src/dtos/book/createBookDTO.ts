@@ -1,4 +1,4 @@
-import { Categoria } from "../../generated/prisma";
+import { Categoria } from "../../../generated/prisma";
 
 export interface CreateBookDTO {
     titulo: string;

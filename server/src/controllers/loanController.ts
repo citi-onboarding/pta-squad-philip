@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { EmprestimoService } from "../services/loan/emprestimo.service";
+import { EmprestimoService } from "../services/loan/loanService";
 
 class EmprestimoController {
   constructor(private readonly emprestimoService = new EmprestimoService()) {}

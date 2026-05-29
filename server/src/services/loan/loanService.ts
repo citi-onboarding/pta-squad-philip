@@ -1,13 +1,12 @@
-import prisma from "@database";
 import { enviarConfirmacaoDevolucao, enviarLembrete } from "../emailServices";
-import { CreateEmprestimoDTO } from "../../dtos/loan/createEmprestimoDTO";
-import { EmprestimoRepository } from "../../repositories/emprestimoRepository";
+import { CreateLoanDTO } from "../../dtos/loan/createLoanDTO";
+import { EmprestimoRepository } from "../../repositories/loanRepository";
 import { NotFoundError } from "../../errors/notFoundError";
 import { ValidationError } from "../../errors/validationError";
 import { atualizarEmprestimosAtrasados } from "./loanHelpers";
 
 export class EmprestimoService {
-  async create(data: CreateEmprestimoDTO) {
+  async create(data: CreateLoanDTO) {
     const {
       livro_id,
       nome_cliente,
@@ -39,7 +38,13 @@ export class EmprestimoService {
       livro.quantidade_disponivel
     );
 
-    return EmprestimoRepository.create(data);
+    return EmprestimoRepository.create({
+      livro_id,
+      nome_cliente,
+      email_cliente,
+      data_locacao: new Date(data_locacao),
+      data_prevista_devolucao: new Date(data_prevista_devolucao),
+    });
   }
 
   async delete(id: string) {

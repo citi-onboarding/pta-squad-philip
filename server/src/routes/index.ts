@@ -1,7 +1,7 @@
 import express from "express";
-import livroRoutes from "./book.routes";
-import emprestimoRoutes from "./emprestimo.routes";
-import dashboardRoutes from "./dashboard.routes";
+import livroRoutes from "./bookRoutes";
+import emprestimoRoutes from "./loanRoutes";
+import dashboardRoutes from "./dashboardRoutes";
 
 const routes = express.Router();
 

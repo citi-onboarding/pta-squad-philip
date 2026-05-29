@@ -1,8 +1,16 @@
 import prisma from "../database";
 import { Emprestimo, Livro } from "../../generated/prisma";
-import { CreateEmprestimoDTO } from "../dtos/loan/createEmprestimoDTO";
+import { CreateLoanDTO } from "../dtos/loan/createLoanDTO";
 
-type EmprestimoWithLivro = Emprestimo & { livro: Livro };
+type LoanWithLivro = Emprestimo & { livro: Livro };
+
+type CreateLoanRepositoryData = {
+  livro_id: string;
+  nome_cliente: string;
+  email_cliente: string;
+  data_locacao: Date;
+  data_prevista_devolucao: Date;
+};
 
 export const EmprestimoRepository = {
   findBookById: async (livro_id: string): Promise<Livro | null> => {
@@ -25,14 +33,14 @@ export const EmprestimoRepository = {
     });
   },
 
-  create: async (data: CreateEmprestimoDTO): Promise<Emprestimo> => {
+  create: async (data: CreateLoanRepositoryData): Promise<Emprestimo> => {
     return prisma.emprestimo.create({
       data: {
         livro_id: data.livro_id,
         nome_cliente: data.nome_cliente,
         email_cliente: data.email_cliente,
-        data_locacao: new Date(data.data_locacao),
-        data_prevista_devolucao: new Date(data.data_prevista_devolucao),
+        data_locacao: data.data_locacao,
+        data_prevista_devolucao: data.data_prevista_devolucao,
         status: "Em_andamento",
       },
     });
@@ -54,14 +62,14 @@ export const EmprestimoRepository = {
     });
   },
 
-  getByIdWithBook: async (id: string): Promise<EmprestimoWithLivro | null> => {
+  getByIdWithBook: async (id: string): Promise<LoanWithLivro | null> => {
     return prisma.emprestimo.findUnique({
       where: { id },
       include: { livro: true },
     });
   },
 
-  getByClienteNome: async (nome: string): Promise<EmprestimoWithLivro[]> => {
+  getByClienteNome: async (nome: string): Promise<LoanWithLivro[]> => {
     return prisma.emprestimo.findMany({
       where: {
         nome_cliente: {
@@ -73,7 +81,7 @@ export const EmprestimoRepository = {
     });
   },
 
-  returnBook: async (id: string, livro_id: string): Promise<EmprestimoWithLivro> => {
+  returnBook: async (id: string, livro_id: string): Promise<LoanWithLivro> => {
     const [emprestimoAtualizado] = await prisma.$transaction([
       prisma.emprestimo.update({
         where: { id },

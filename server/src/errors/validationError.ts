@@ -7,5 +7,3 @@ export class ValidationError extends AppError {
     Object.setPrototypeOf(this, ValidationError.prototype);
   }
 }
-
-//throw new NotFoundError("Livro não encontrado")
