@@ -21,44 +21,62 @@ export default function RegisterNewBook() {
   const router = useRouter();
 
   function validateField(fieldName: string, value: string) {
-  setErrors((prev) => {
-    const newErrors = { ...prev };
-    const isbnRegex = /^(\d{10}|\d{13})$/;
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      const isbnRegex = /^(\d{10}|\d{13})$/;
 
-    switch (fieldName) {
-      case "titulo":
-        value ? delete newErrors.titulo : (newErrors.titulo = "*Este é um campo obrigatório.");
-        break;
-      case "autor":
-        value ? delete newErrors.autor : (newErrors.autor = "*Este é um campo obrigatório.");
-        break;
-      case "isbn":
-        if (!value) newErrors.isbn = "*Este é um campo obrigatório.";
-        else if (!isbnRegex.test(value)) newErrors.isbn = "*O ISBN deve ter 10 ou 13 dígitos.";
-        else delete newErrors.isbn;
-        break;
-      case "editora":
-        value ? delete newErrors.editora : (newErrors.editora = "*Este é um campo obrigatório.");
-        break;
-      case "ano":
-        value ? delete newErrors.ano : (newErrors.ano = "*Este é um campo obrigatório.");
-        break;
-      case "quantidade":
-        value ? delete newErrors.quantidade : (newErrors.quantidade = "*Este é um campo obrigatório.");
-        break;
-      case "categoria":
-        value ? delete newErrors.categoria : (newErrors.categoria = "*Este é um campo obrigatório.");
-        break;
-    }
+      switch (fieldName) {
+        case "titulo":
+          value
+            ? delete newErrors.titulo
+            : (newErrors.titulo = "*Este é um campo obrigatório.");
+          break;
+        case "autor":
+          value
+            ? delete newErrors.autor
+            : (newErrors.autor = "*Este é um campo obrigatório.");
+          break;
+        case "isbn":
+          if (!value) newErrors.isbn = "*Este é um campo obrigatório.";
+          else if (!isbnRegex.test(value))
+            newErrors.isbn = "*O ISBN deve ter 10 ou 13 dígitos.";
+          else delete newErrors.isbn;
+          break;
+        case "editora":
+          value
+            ? delete newErrors.editora
+            : (newErrors.editora = "*Este é um campo obrigatório.");
+          break;
+        case "ano":
+          if (!value) newErrors.ano = "*Este é um campo obrigatório.";
+          else if (
+            Number(value) < 1 ||
+            Number(value) > new Date().getFullYear()
+          )
+            newErrors.ano = `*O ano deve ser entre 1 e ${new Date().getFullYear()}.`;
+          else delete newErrors.ano;
+          break;
 
-    return newErrors;
-  });
-}
+        case "quantidade":
+          if (!value) newErrors.quantidade = "*Este é um campo obrigatório.";
+          else if (Number(value) < 1)
+            newErrors.quantidade = "*A quantidade deve ser maior que zero.";
+          else delete newErrors.quantidade;
+          break;
+        case "categoria":
+          value
+            ? delete newErrors.categoria
+            : (newErrors.categoria = "*Este é um campo obrigatório.");
+          break;
+      }
 
-function handleChange(e: ChangeEvent<HTMLInputElement>) {
-  validateField(e.target.name, e.target.value);
-}
+      return newErrors;
+    });
+  }
 
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+    validateField(e.target.name, e.target.value);
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -78,9 +96,20 @@ function handleChange(e: ChangeEvent<HTMLInputElement>) {
     }
 
     if (!data.editora) newErrors.editora = "*Este é um campo obrigatório.";
-    if (!data.ano) newErrors.ano = "*Este é um campo obrigatório.";
-    if (!data.quantidade)
+    if (!data.ano) {
+      newErrors.ano = "*Este é um campo obrigatório.";
+    } else if (
+      Number(data.ano) < 1 ||
+      Number(data.ano) > new Date().getFullYear()
+    ) {
+      newErrors.ano = `*O ano deve ser entre 1 e ${new Date().getFullYear()}.`;
+    }
+
+    if (!data.quantidade) {
       newErrors.quantidade = "*Este é um campo obrigatório.";
+    } else if (Number(data.quantidade) < 1) {
+      newErrors.quantidade = "*A quantidade deve ser maior que zero.";
+    }
     if (!data.categoria) newErrors.categoria = "*Este é um campo obrigatório.";
 
     if (Object.keys(newErrors).length > 0) {
@@ -103,7 +132,6 @@ function handleChange(e: ChangeEvent<HTMLInputElement>) {
       });
 
       router.push("/livros");
-      
     } catch (error) {
       console.error(error);
       alert("Erro ao cadastrar livro.");
@@ -266,18 +294,17 @@ function handleChange(e: ChangeEvent<HTMLInputElement>) {
                     onChange={handleChange}
                   />
                   <div className="flex w-[146.88px] h-[174.86px] flex-col items-center justify-end rounded-[8px] border-[1.67px] border-slate-200 bg-white px-[17.66px] pt-[17.66px] pb-[1.67px] text-sm text-slate-500 transition-all hover:bg-slate-50 peer-checked:border-[#00C389] peer-checked:bg-[#E6F9F0] peer-checked:font-medium peer-checked:text-[#00C389] gap-[8px]">
-                      <img
-                        src={
-                          capas[
-                            cat
-                              .normalize("NFD")
-                              .replace(/[\u0300-\u036f]/g, "")
-                          ]}
-                        alt={cat}
-                        className="h-[140px] object-contain"
-                      />
+                    <img
+                      src={
+                        capas[
+                          cat.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                        ]
+                      }
+                      alt={cat}
+                      className="h-[140px] object-contain"
+                    />
 
-                      <span>{cat}</span>
+                    <span>{cat}</span>
                   </div>
                 </label>
               ))}
