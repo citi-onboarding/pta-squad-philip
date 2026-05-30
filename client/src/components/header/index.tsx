@@ -107,18 +107,18 @@ export function Header() {
               </Link>
 
               <div className="h-[1px] w-full bg-gray-100 my-1" />
-
-              <Button
-                text="Novo Livro"
-                icon={<Plus size={18} />}
-                iconPosition="left"
-                variantColor="bg-[#00C389] text-white"
-                customSize="w-full h-[40px]"
-                onClick={() => {
-                  console.log("Funcionando!");
-                  toggleMenu();
-                }}
-              />
+              <Link href="/livros/novo" onClick={toggleMenu}>
+                <Button
+                  text="Novo Livro"
+                  icon={<Plus size={18} />}
+                  iconPosition="left"
+                  variantColor="bg-[#00C389] text-white"
+                  customSize="w-full h-[40px]"
+                  onClick={() => {
+                    console.log("Funcionando!");
+                  }}
+                />
+                </Link>
             </div>
           )}
         </div>
