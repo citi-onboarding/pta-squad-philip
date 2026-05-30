@@ -20,17 +20,45 @@ export default function RegisterNewBook() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
 
-  function handleChange(e: ChangeEvent<HTMLInputElement>) {
-    const fieldName = e.target.name;
+  function validateField(fieldName: string, value: string) {
+  setErrors((prev) => {
+    const newErrors = { ...prev };
+    const isbnRegex = /^(\d{10}|\d{13})$/;
 
-    if (errors[fieldName]) {
-      setErrors((prevErrors) => {
-        const newErrors = { ...prevErrors };
-        delete newErrors[fieldName];
-        return newErrors;
-      });
+    switch (fieldName) {
+      case "titulo":
+        value ? delete newErrors.titulo : (newErrors.titulo = "*Este é um campo obrigatório.");
+        break;
+      case "autor":
+        value ? delete newErrors.autor : (newErrors.autor = "*Este é um campo obrigatório.");
+        break;
+      case "isbn":
+        if (!value) newErrors.isbn = "*Este é um campo obrigatório.";
+        else if (!isbnRegex.test(value)) newErrors.isbn = "*O ISBN deve ter 10 ou 13 dígitos.";
+        else delete newErrors.isbn;
+        break;
+      case "editora":
+        value ? delete newErrors.editora : (newErrors.editora = "*Este é um campo obrigatório.");
+        break;
+      case "ano":
+        value ? delete newErrors.ano : (newErrors.ano = "*Este é um campo obrigatório.");
+        break;
+      case "quantidade":
+        value ? delete newErrors.quantidade : (newErrors.quantidade = "*Este é um campo obrigatório.");
+        break;
+      case "categoria":
+        value ? delete newErrors.categoria : (newErrors.categoria = "*Este é um campo obrigatório.");
+        break;
     }
-  }
+
+    return newErrors;
+  });
+}
+
+function handleChange(e: ChangeEvent<HTMLInputElement>) {
+  validateField(e.target.name, e.target.value);
+}
+
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
