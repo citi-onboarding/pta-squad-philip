@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import type { FormEvent, ChangeEvent } from "react";
+import api from "@/services/api";
 
 export interface FormDataProps {
   titulo: string;
@@ -119,7 +120,7 @@ export default function RegisterNewBook() {
 
     setErrors({});
     try {
-      await axios.post("http://localhost:3001/livros", {
+      await api.post("/livros", {
         titulo: data.titulo,
         autor: data.autor,
         isbn: data.isbn,
