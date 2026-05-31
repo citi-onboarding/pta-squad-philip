@@ -12,7 +12,6 @@ import {
   Barlow_900Black,
 } from "@expo-google-fonts/barlow";
 import { useCallback } from "react";
-import { ThemeProvider } from "@components";
 import "../src/styles/global.css";
 
 SplashScreen.preventAutoHideAsync();
@@ -41,9 +40,7 @@ export default function Layout() {
 
   return (
     <SafeAreaProvider onLayout={onLayoutRootView}>
-      <ThemeProvider>
-        <Slot />
-      </ThemeProvider>
+      <Slot />
     </SafeAreaProvider>
   );
 }

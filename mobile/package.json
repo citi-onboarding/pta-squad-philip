@@ -12,6 +12,7 @@
     "@babel/runtime": "^7.27.1",
     "@expo-google-fonts/barlow": "^0.2.3",
     "babel-preset-expo": "^13.1.11",
+    "expo": "~53.0.0",
     "expo-asset": "^11.1.5",
     "expo-constants": "~17.1.5",
     "expo-font": "~13.3.1",
