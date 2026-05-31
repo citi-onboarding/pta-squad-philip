@@ -47,7 +47,7 @@ model Emprestimo{
   data_ultimo_lembrete_atraso DateTime?
   status Status @default(Em_andamento)
 
-  livro Livro @relation(fields: [livro_id], references: [id])
+  livro Livro @relation(fields: [livro_id], references: [id], onDelete: Cascade)
 }
 
 
