@@ -85,7 +85,7 @@ class LivroController implements Crud {
       // First filters by category in the database, if provided.
       const livros = await prisma.livro.findMany({
         where: {
-          categoria: categoria ? String(categoria) : undefined,
+          categoria: categoria ? (String(categoria) as any) : undefined,
         },
       });
 
