@@ -85,7 +85,7 @@ class LivroController implements Crud {
       // First filters by category in the database, if provided.
       const livros = await prisma.livro.findMany({
         where: {
-          categoria: categoria ? String(categoria) : undefined,
+          categoria: categoria ? (String(categoria) as any) : undefined,
         },
       });
 
@@ -153,21 +153,27 @@ class LivroController implements Crud {
    */
   delete = async (request: Request, response: Response) => {
     try {
-      // The book ID is received through route parameters.
       const { id } = request.params;
+
+      const emprestimosAtivos = await prisma.emprestimo.count({
+        where: {
+          livro_id: id,
+          status: { in: ["Em_andamento", "Atrasado"] },
+        },
+      });
+
+      if (emprestimosAtivos > 0) {
+        return response.status(400).send({
+          message: "Não é possível excluir um livro com empréstimos em andamento.",
+        });
+      }
 
       const { httpStatus, messageFromDelete } = await this.citi.deleteValue(id);
 
-      return response.status(httpStatus).send({
-        message: messageFromDelete,
-      });
+      return response.status(httpStatus).send({ message: messageFromDelete });
     } catch (error) {
-      // Logs unexpected errors and returns a generic server response.
       console.error(error);
-
-      return response.status(500).send({
-        message: "Erro interno ao excluir livro.",
-      });
+      return response.status(500).send({ message: "Erro interno ao excluir livro." });
     }
   };
 }
