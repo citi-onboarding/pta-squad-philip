@@ -304,7 +304,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   );
 };
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   // Dark background overlay
   overlay: {
     position: "fixed" as const,
