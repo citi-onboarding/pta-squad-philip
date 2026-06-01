@@ -1,5 +1,5 @@
 import { Search } from "lucide-react-native";
-import { StyleSheet, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, useWindowDimensions, View } from "react-native";
 
 interface SearchInputProps {
   value: string;
@@ -12,16 +12,35 @@ export function SearchInput({
   onChangeText,
   placeholder = "Nome ou título do livro",
 }: SearchInputProps) {
+  const { width } = useWindowDimensions();
+
+  const isSmallScreen = width <= 360;
+
   return (
-    <View style={styles.container}>
-      <Search size={24} color="#6B7280" />
+    <View
+      style={[
+        styles.container,
+        {
+          height: isSmallScreen ? 56 : 62,
+          paddingHorizontal: isSmallScreen ? 14 : 16,
+        },
+      ]}
+    >
+      <View style={styles.iconContainer}>
+        <Search size={isSmallScreen ? 22 : 24} color="#6B7280" />
+      </View>
 
       <TextInput
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor="#8C8C96"
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            fontSize: isSmallScreen ? 17 : 20,
+          },
+        ]}
       />
     </View>
   );
@@ -29,7 +48,6 @@ export function SearchInput({
 
 const styles = StyleSheet.create({
   container: {
-    height: 62,
     width: "100%",
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
@@ -37,14 +55,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    gap: 12,
+  },
+
+  iconContainer: {
+    width: 28,
+    alignItems: "flex-start",
+    justifyContent: "center",
+    flexShrink: 0,
   },
 
   input: {
     flex: 1,
-    fontSize: 20,
+    minWidth: 0,
     color: "#242424",
     paddingVertical: 0,
+    paddingLeft: 6,
   },
 });

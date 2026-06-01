@@ -4,6 +4,7 @@ import {
   FlatList,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 
@@ -23,6 +24,10 @@ interface Emprestimo {
 }
 
 export default function Home() {
+  const { width } = useWindowDimensions();
+
+  const isSmallScreen = width <= 360;
+
   const [nome, setNome] = useState("");
   const [emprestimos, setEmprestimos] = useState<Emprestimo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -59,7 +64,15 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
+      <View
+        style={[
+          styles.content,
+          {
+            paddingHorizontal: isSmallScreen ? 24 : 42,
+            paddingTop: isSmallScreen ? 24 : 30,
+          },
+        ]}
+      >
         <SearchInput
           value={nome}
           onChangeText={setNome}
@@ -121,8 +134,6 @@ const styles = StyleSheet.create({
 
   content: {
     flex: 1,
-    paddingHorizontal: 42,
-    paddingTop: 30,
   },
 
   buttonContainer: {
