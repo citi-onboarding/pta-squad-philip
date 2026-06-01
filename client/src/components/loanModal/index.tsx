@@ -18,7 +18,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 
-import { useIsMobile } from "../../hooks/use-mobile";
+import { useIsMobile } from "../../hooks/useMobile";
 import { Input } from "../ui/input";
 import { X } from "lucide-react";
 import { Field, FieldLabel, FieldError } from "../ui/field";
