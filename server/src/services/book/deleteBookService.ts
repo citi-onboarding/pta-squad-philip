@@ -1,6 +1,7 @@
 import { BookRepository } from "../../repositories/bookRepository";
 import { NotFoundError } from "../../errors/notFoundError";
 import { ValidationError } from "../../errors/validationError";
+import { ConflictError } from "../../errors/conflictError";
 
 export class DeleteBookService {
   async execute(id: string) {
@@ -12,6 +13,15 @@ export class DeleteBookService {
 
     if (!livro) {
       throw new NotFoundError("Livro não encontrado.");
+    }
+
+    const emprestimosAtivos =
+      await BookRepository.countActiveOrLateLoansByBookId(id);
+
+    if (emprestimosAtivos > 0) {
+      throw new ConflictError(
+        "Não é possível excluir um livro com empréstimos em andamento ou atrasados."
+      );
     }
 
     await BookRepository.delete(id);
