@@ -10,7 +10,7 @@ import {
 export function MobileHeader() {
   const { width } = useWindowDimensions();
 
-  const isSmallScreen = width <= 360;
+  const isCompactScreen = width <= 480;
 
   return (
     <View style={styles.header}>
@@ -18,8 +18,9 @@ export function MobileHeader() {
         style={[
           styles.content,
           {
-            paddingHorizontal: isSmallScreen ? 24 : 43,
-            gap: isSmallScreen ? 14 : 24,
+            paddingLeft: isCompactScreen ? 28 : 43,
+            paddingRight: isCompactScreen ? 16 : 24,
+            gap: isCompactScreen ? 14 : 24,
           },
         ]}
       >
@@ -28,8 +29,8 @@ export function MobileHeader() {
           style={[
             styles.logo,
             {
-              width: isSmallScreen ? 55 : 69,
-              height: isSmallScreen ? 26 : 32,
+              width: isCompactScreen ? 54 : 69,
+              height: isCompactScreen ? 25 : 32,
             },
           ]}
           resizeMode="contain"
@@ -39,8 +40,8 @@ export function MobileHeader() {
           style={[
             styles.title,
             {
-              fontSize: isSmallScreen ? 20 : 22,
-              lineHeight: isSmallScreen ? 25 : 28,
+              fontSize: isCompactScreen ? 18 : 26,
+              lineHeight: isCompactScreen ? 22 : 28,
             },
           ]}
           numberOfLines={1}
@@ -80,8 +81,11 @@ const styles = StyleSheet.create({
   },
 
   content: {
+    width: "100%",
+    height: "100%",
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "flex-start",
   },
 
   logo: {
@@ -89,8 +93,8 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    flex: 1,
     color: "#222222",
     fontWeight: "500",
+    flexShrink: 1,
   },
 });
