@@ -66,6 +66,7 @@ export default function LivrosPage() {
     nome_cliente: string;
     email_cliente: string;
     data_prevista_devolucao: string;
+    data_locacao: string;
   }) => {
     if (!livroLoan) return;
 
@@ -82,7 +83,7 @@ export default function LivrosPage() {
         email_cliente: data.email_cliente,
         data_prevista_devolucao: dataObjeto.toLocaleDateString('sv-SE'),
         data_locacao: new Date().toISOString(),
-      });
+      })
 
       setLoanOpen(false);
       setBookLoan(null);
