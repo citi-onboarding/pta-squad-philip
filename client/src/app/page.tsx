@@ -14,7 +14,7 @@ const statusMap: Record<string, "Em andamento" | "Devolvido" | "Atrasado"> = {
 
 const formatDate = (iso: string) => new Date(iso).toLocaleDateString("pt-BR");
 
-const todasCategorias = ["Romance", "Tecnologia", "História", "Ciências", "Infantil"];
+const allCategories = ["Romance", "Tecnologia", "História", "Ciências", "Infantil"];
 
 const normalize = (str: string) =>
   str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -22,11 +22,11 @@ const normalize = (str: string) =>
 export default function Home() {
   const { data } = useDashboard()
 
-  const livrosPorCategoriaCompleto = todasCategorias.map((categoria) => {
-    const encontrado = data.livrosPorCategoria.find(
+  const allBooksByCategory = allCategories.map((categoria) => {
+    const finded = data.livrosPorCategoria.find(
       (item) => normalize(item.categoria) === normalize(categoria)
     );
-    return { categoria, quantidade: encontrado?.quantidade ?? 0 };
+    return { categoria, quantidade: finded?.quantidade ?? 0 };
   });
 
   return (
@@ -47,7 +47,7 @@ export default function Home() {
           <h2 className="text-base font-semibold text-gray-700 ml-4 mt-2 mb-4">
             Livros por Categoria
           </h2>
-          <CategoryChart data={livrosPorCategoriaCompleto} />
+          <CategoryChart data={allBooksByCategory} />
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-6">

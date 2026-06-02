@@ -44,7 +44,7 @@ interface LoanModalProps {
   onOpenChange: (isOpen: boolean) => void
   bookTitle: string
   apiError: string | null;
-  onConfirm: (data: { nome_cliente: string; email_cliente: string; data_locacao: string; data_prevista_devolucao: string }) => Promise<void>;
+  onConfirm: (data: { clientName: string; clientEmail: string; loanDate: string; expectedReturnDate: string }) => Promise<void>;
 }
 
 export function LoanModal({ open, onOpenChange, bookTitle, apiError, onConfirm }: LoanModalProps) {
@@ -125,10 +125,10 @@ export function LoanModal({ open, onOpenChange, bookTitle, apiError, onConfirm }
       return
     }
     await onConfirm({
-      nome_cliente: formData.clientName,
-      email_cliente: formData.clientEmail,
-      data_prevista_devolucao: formData.returnDate,
-      data_locacao: formData.loanDate,
+      clientName: formData.clientName,
+      clientEmail: formData.clientEmail,
+      expectedReturnDate: formData.returnDate,
+      loanDate: formData.loanDate,
       })
   }
 

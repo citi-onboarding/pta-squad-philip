@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { LoanHistoryCard } from "./LoanHistoryCard";
-import {
-  getBookDetails,
-  sendLoanReminder,
-  returnBookLoan,
-  BookDetails,
-} from "@/services/bookDetailModal";
-import { categoryImageMap } from "@/lib/categoryMap";
+import { BookDetails } from "@/services/books.service";
+import { getBookById as getBookDetails, } from "@/services/books.service";
+import { sendLoanReminder, returnLoan as returnBookLoan } from "@/services/loans.service";
+
+// Static asset mapping matching book categories to local covers
+const capas: Record<string, string> = {
+  Romance: "/Capas de Livros/Romance.png",
+  Tecnologia: "/Capas de Livros/Tecnologia.png",
+  História: "/Capas de Livros/Historia.png",
+  Ciências: "/Capas de Livros/Ciencias.png",
+  Infantil: "/Capas de Livros/Infantil.png",
+};
 
 // Props expected by the BookDetailModal component
 interface BookDetailModalProps {
@@ -24,18 +29,18 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   onReturnSuccess,
 }) => {
   // Stores fetched book data
-  const [livro, setLivro] = useState<BookDetails | null>(null);
+  const [book, setBook] = useState<BookDetails | null>(null);
 
   // Controls loading state while fetching book details
   const [loading, setLoading] = useState<boolean>(false);
 
   // Stores the loan id currently sending a reminder email
-  const [lembreteLoadingId, setLembreteLoadingId] = useState<string | null>(
+  const [reminderLoadingId, setReminderLoadingId] = useState<string | null>(
     null,
   );
 
   // Stores the loan id currently being returned
-  const [devolucaoLoadingId, setDevolucaoLoadingId] = useState<string | null>(
+  const [returnLoadingId, setReturnLoadingId] = useState<string | null>(
     null,
   );
 
@@ -51,12 +56,12 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   }, []);
 
   // Fetches book details from the service
-  const buscarLivro = async () => {
+  const fetchBook = async () => {
     try {
       setLoading(true);
 
-      const livroDetalhado = await getBookDetails(id);
-      setLivro(livroDetalhado);
+      const bookDetails = await getBookDetails(id);
+      setBook(bookDetails);
     } catch (error) {
       console.error("Erro ao buscar detalhes do livro:", error);
       alert("Erro ao carregar detalhes do livro.");
@@ -68,7 +73,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   // Fetches book details when the modal opens
   useEffect(() => {
     if (isOpen && id) {
-      buscarLivro();
+      fetchBook();
     }
   }, [isOpen, id]);
 
@@ -76,8 +81,8 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   if (!isOpen) return null;
 
   // Sorts loans by most recent rental date and selects only the last 3 loans
-  const tresUltimos = livro?.emprestimos
-    ? [...livro.emprestimos]
+  const lastThree = book?.emprestimos
+    ? [...book.emprestimos]
         .sort(
           (a, b) =>
             new Date(b.data_locacao).getTime() -
@@ -87,9 +92,9 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
     : [];
 
   // Sends a reminder email for overdue loans
-  const handleEnviarLembrete = async (emprestimoId: string) => {
+  const handleSendReminder = async (emprestimoId: string) => {
     try {
-      setLembreteLoadingId(emprestimoId);
+      setReminderLoadingId(emprestimoId);
 
       await sendLoanReminder(emprestimoId);
 
@@ -98,14 +103,14 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
       console.error("Erro ao enviar lembrete:", error);
       alert("Falha ao enviar o e-mail de lembrete.");
     } finally {
-      setLembreteLoadingId(null);
+      setReminderLoadingId(null);
     }
   };
 
   // Marks a loan as returned and refreshes the book details
-  const handleDevolver = async (emprestimoId: string) => {
+  const handleReturn = async (emprestimoId: string) => {
     try {
-      setDevolucaoLoadingId(emprestimoId);
+      setReturnLoadingId(emprestimoId);
 
       await returnBookLoan(emprestimoId);
 
@@ -113,14 +118,14 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
         "Livro marcado como devolvido e e-mail de confirmação enviado com sucesso.",
       );
 
-      await buscarLivro();
+      await fetchBook();
 
       await onReturnSuccess?.();
     } catch (error) {
       console.error("Erro ao marcar como devolvido:", error);
       alert("Falha ao marcar o livro como devolvido.");
     } finally {
-      setDevolucaoLoadingId(null);
+      setReturnLoadingId(null);
     }
   };
 
@@ -160,7 +165,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
         {/* Loading state */}
         {loading ? (
           <div style={styles.centerMessage}>Carregando informações...</div>
-        ) : livro ? (
+        ) : book ? (
           <div style={styles.modalContent}>
             {/* Top section - Book information */}
             <div
@@ -180,8 +185,8 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
                 }}
               >
                 <img
-                  src={categoryImageMap[livro.categoria] || "/img/default.jpg"}
-                  alt={livro.titulo}
+                  src={capas[book.categoria] || "/img/default.jpg"}
+                  alt={book.titulo}
                   style={styles.coverImg}
                 />
               </div>
@@ -193,44 +198,44 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
                   width: isMobile ? "100%" : undefined,
                 }}
               >
-                <h2 style={styles.bookTitle}>{livro.titulo}</h2>
-                <p style={styles.bookAuthor}>{livro.autor}</p>
+                <h2 style={styles.bookTitle}>{book.titulo}</h2>
+                <p style={styles.bookAuthor}>{book.autor}</p>
 
                 {/* Grid containing book metadata */}
                 <div style={styles.detailsGrid}>
                   <div style={{ width: "50%", marginBottom: "18px" }}>
                     <span style={styles.label}>ISBN</span>
-                    <p style={styles.value}>{livro.isbn}</p>
+                    <p style={styles.value}>{book.isbn}</p>
                   </div>
 
                   <div style={{ width: "50%", marginBottom: "18px" }}>
                     <span style={styles.label}>Categoria</span>
                     <p style={{ ...styles.value, color: "#10b981" }}>
-                      {livro.categoria}
+                      {book.categoria}
                     </p>
                   </div>
 
                   <div style={{ width: "50%", marginBottom: "18px" }}>
                     <span style={styles.label}>Editora</span>
-                    <p style={styles.value}>{livro.editora}</p>
+                    <p style={styles.value}>{book.editora}</p>
                   </div>
 
                   <div style={{ width: "50%", marginBottom: "18px" }}>
                     <span style={styles.label}>Ano</span>
-                    <p style={styles.value}>{livro.ano}</p>
+                    <p style={styles.value}>{book.ano}</p>
                   </div>
 
                   <div style={{ width: "50%" }}>
                     <span style={styles.label}>Quantidade Total</span>
                     <p style={styles.value}>
-                      {livro.quantidade_total} unidades
+                      {book.quantidade_total} unidades
                     </p>
                   </div>
 
                   <div style={{ width: "50%" }}>
                     <span style={styles.label}>Quantidade Disponível</span>
                     <p style={{ ...styles.value, color: "#10b981" }}>
-                      {livro.quantidade_disponivel} unidades
+                      {book.quantidade_disponivel} unidades
                     </p>
                   </div>
                 </div>
@@ -261,20 +266,20 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
               />
 
               {/* Displays loan cards if loans exist */}
-              {tresUltimos.length > 0 ? (
-                tresUltimos.map((loan) => (
+              {lastThree.length > 0 ? (
+                lastThree.map((loan) => (
                   <LoanHistoryCard
                     key={loan.id}
                     id={loan.id}
-                    nomeCliente={loan.nome_cliente}
-                    emailCliente={loan.email_cliente}
-                    dataLocacao={loan.data_locacao}
-                    dataPrevistaDevolucao={loan.data_prevista_devolucao}
+                    clientName={loan.nome_cliente}
+                    clientEmail={loan.email_cliente}
+                    loanDate={loan.data_locacao}
+                    expectedReturnDate={loan.data_prevista_devolucao}
                     status={loan.status}
-                    onEnviarLembrete={handleEnviarLembrete}
-                    onDevolver={handleDevolver}
-                    lembreteLoading={lembreteLoadingId === loan.id}
-                    devolucaoLoading={devolucaoLoadingId === loan.id}
+                    onSendReminder={handleSendReminder}
+                    onReturn={handleReturn}
+                    reminderLoading={reminderLoadingId === loan.id}
+                    returnLoading={returnLoadingId === loan.id}
                   />
                 ))
               ) : (

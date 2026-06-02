@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import type { FormEvent, ChangeEvent } from "react";
-import api from "@/services/api";
+import { createBook } from "@/services/books.service";
 import { categoryImageMap } from "@/lib/categoryMap";
 
 export interface FormDataProps {
@@ -121,11 +121,11 @@ export default function RegisterNewBook() {
 
     setErrors({});
     try {
-      await api.post("/livros", {
-        titulo: data.titulo,
-        autor: data.autor,
-        isbn: data.isbn,
-        editora: data.editora,
+      await createBook({
+        titulo: data.titulo as string,
+        autor: data.autor as string,
+        isbn: data.isbn as string,
+        editora: data.editora as string,
         ano: Number(data.ano),
         quantidade_total: Number(data.quantidade),
         categoria: (data.categoria as string)
