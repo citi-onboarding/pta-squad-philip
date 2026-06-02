@@ -27,6 +27,22 @@ export class EmprestimoService {
       throw new ValidationError("Todos os campos precisam ser preenchidos.");
     }
 
+    const dataLocacao = new Date(data_locacao);
+    const dataPrevistaDevolucao = new Date(data_prevista_devolucao);
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    if (dataLocacao > dataPrevistaDevolucao) {
+      throw new ValidationError("A data de locação não pode ser posterior à data prevista de devolução.");
+    }
+
+    const limiteMaximo = new Date(dataLocacao);
+    limiteMaximo.setDate(limiteMaximo.getDate() + 45);
+
+    if (dataPrevistaDevolucao > limiteMaximo) {
+      throw new ValidationError("O prazo máximo de empréstimo é de 45 dias. Para períodos maiores, é necessário renovar o empréstimo.");
+    }
+
     const livro = await EmprestimoRepository.findBookById(livro_id);
 
     if (!livro || livro.quantidade_disponivel <= 0) {
@@ -54,7 +70,11 @@ export class EmprestimoService {
       throw new NotFoundError("Empréstimo não encontrado.");
     }
 
-    await EmprestimoRepository.increaseBookAvailability(emprestimo.livro_id);
+
+    if (emprestimo.status === "Em_andamento" || emprestimo.status === "Atrasado") {
+      await EmprestimoRepository.increaseBookAvailability(emprestimo.livro_id);
+    }
+
     await EmprestimoRepository.delete(id);
 
     return { message: "Empréstimo deletado com sucesso." };

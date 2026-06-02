@@ -2,6 +2,7 @@ import prisma from "@database";
 
 export async function atualizarEmprestimosAtrasados() {
   const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
 
   await prisma.emprestimo.updateMany({
     where: {

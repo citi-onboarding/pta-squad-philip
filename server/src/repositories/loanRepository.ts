@@ -27,9 +27,23 @@ export const EmprestimoRepository = {
   },
 
   increaseBookAvailability: async (livro_id: string): Promise<Livro> => {
+    const livro = await prisma.livro.findUnique({
+      where: { id: livro_id },
+    });
+
+    if (!livro) {
+      throw new Error("Livro não encontrado.");
+    }
+
+    // Garante que a quantidade disponível nunca ultrapasse a quantidade total
+    const novaQuantidade = Math.min(
+      livro.quantidade_disponivel + 1,
+      livro.quantidade_total
+    );
+
     return prisma.livro.update({
       where: { id: livro_id },
-      data: { quantidade_disponivel: { increment: 1 } },
+      data: { quantidade_disponivel: novaQuantidade },
     });
   },
 
@@ -82,6 +96,20 @@ export const EmprestimoRepository = {
   },
 
   returnBook: async (id: string, livro_id: string): Promise<LoanWithLivro> => {
+    // Busca o livro para garantir que não ultrapasse quantidade_total
+    const livro = await prisma.livro.findUnique({
+      where: { id: livro_id },
+    });
+
+    if (!livro) {
+      throw new Error("Livro não encontrado.");
+    }
+
+    const novaQuantidade = Math.min(
+      livro.quantidade_disponivel + 1,
+      livro.quantidade_total
+    );
+
     const [emprestimoAtualizado] = await prisma.$transaction([
       prisma.emprestimo.update({
         where: { id },
@@ -94,7 +122,7 @@ export const EmprestimoRepository = {
 
       prisma.livro.update({
         where: { id: livro_id },
-        data: { quantidade_disponivel: { increment: 1 } },
+        data: { quantidade_disponivel: novaQuantidade },
       }),
     ]);
 

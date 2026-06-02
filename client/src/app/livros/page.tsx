@@ -7,6 +7,7 @@ import BookFilters from "@/components/bookFilters";
 import { BookDetailModal } from "@/components/BookDetailModal/BookDetailModal";
 import { LoanModal } from "@/components/loanModal";
 import { createLoan } from "@/services/loanPayload";
+import { categoryImageMap } from "@/lib/categoryMap";
 
 interface Livro {
   id: string;
@@ -15,14 +16,6 @@ interface Livro {
   categoria: string;
   quantidade_disponivel: number;
 }
-
-const capas: Record<string, string> = {
-  Romance: "/Capas de Livros/Romance.png",
-  Tecnologia: "/Capas de Livros/Tecnologia.png",
-  Historia: "/Capas de Livros/Historia.png",
-  Ciencias: "/Capas de Livros/Ciencias.png",
-  Infantil: "/Capas de Livros/Infantil.png",
-};
 
 export default function LivrosPage() {
   const [search, setSearch] = useState("");
@@ -81,7 +74,7 @@ export default function LivrosPage() {
         livro_id: String(livroLoan.id),
         nome_cliente: data.nome_cliente,
         email_cliente: data.email_cliente,
-        data_prevista_devolucao: dataObjeto.toLocaleDateString('sv-SE'),
+        data_prevista_devolucao: dataObjeto.toISOString(),
         data_locacao: new Date(`${data.data_locacao}T12:00:00`).toISOString(),
       })
 
@@ -161,7 +154,7 @@ export default function LivrosPage() {
               title={livro.titulo}
               author={livro.autor}
               category={livro.categoria}
-              imageUrl={capas[livro.categoria]}
+              imageUrl={categoryImageMap[livro.categoria]}
               availableQuantity={livro.quantidade_disponivel}
               onView={() => {
                 setBookDetailId(livro.id);

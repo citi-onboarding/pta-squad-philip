@@ -31,10 +31,35 @@ export class CreateBookService {
       throw new ValidationError("Todos os campos são obrigatórios.");
     }
 
-    const isbnDigitsLength = String(isbn).replace(/\D/g, "").length;
+    const stringFields = { titulo, autor, editora, categoria };
+    for (const [fieldName, fieldValue] of Object.entries(stringFields)) {
+      if (typeof fieldValue === "string" && !fieldValue.trim()) {
+        throw new ValidationError(`O campo ${fieldName} não pode estar vazio.`);
+      }
+    }
 
-    if (isbnDigitsLength !== 10 && isbnDigitsLength !== 13) {
+    const isbnString = String(isbn).trim();
+
+    if (!isbnString) {
+      throw new ValidationError("O ISBN não pode estar vazio.");
+    }
+
+    if (!/^\d+$/.test(isbnString)) {
+      throw new ValidationError("O ISBN deve conter apenas números.");
+    }
+
+    if (isbnString.length !== 10 && isbnString.length !== 13) {
       throw new ValidationError("O ISBN deve conter 10 ou 13 dígitos numéricos.");
+    }
+
+    const currentYear = new Date().getFullYear();
+    if (!Number.isInteger(ano) || ano < 1000 || ano > currentYear) {
+      throw new ValidationError(`O ano deve estar entre 1000 e ${currentYear}.`);
+    }
+
+    // Validações de quantidade
+    if (!Number.isInteger(quantidade_total) || quantidade_total <= 0) {
+      throw new ValidationError("A quantidade total deve ser um número inteiro maior que zero.");
     }
 
     const livroComMesmoIsbn = await BookRepository.findByIsbn(String(isbn));
