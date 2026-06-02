@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import prisma from "@database";
-import { enviarLembrete } from "src/services/email.services";
+import { enviarLembrete } from "../services/emailServices";
+import { atualizarEmprestimosAtrasados } from "../services/loan/loanHelpers";
 
 // Creates a full-day interval to compare DateTime fields by calendar day.
 function criarIntervaloDoDia(data: Date) {
@@ -75,18 +76,7 @@ async function enviarLembreteDeAtraso() {
   const intervaloHoje = criarIntervaloDoDia(hoje);
 
   // Active loans past their expected return date are persisted as overdue.
-  await prisma.emprestimo.updateMany({
-    where: {
-      status: "Em_andamento",
-      data_devolucao_real: null,
-      data_prevista_devolucao: {
-        lt: intervaloHoje.inicio,
-      },
-    },
-    data: {
-      status: "Atrasado",
-    },
-  });
+  await atualizarEmprestimosAtrasados();
 
   // Overdue reminders are limited to one email per loan per day.
   const emprestimos = await prisma.emprestimo.findMany({

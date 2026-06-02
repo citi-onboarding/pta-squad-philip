@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { LoanHistoryCard } from "./LoanHistoryCard";
-import { BookDetails } from "@/services/books.service";
-import { useBookDetails } from "@/hooks/useBookDetails";
-
-// Static asset mapping matching book categories to local covers
-const capas: Record<string, string> = {
-  Romance: "/Capas de Livros/Romance.png",
-  Tecnologia: "/Capas de Livros/Tecnologia.png",
-  Historia: "/Capas de Livros/Historia.png",
-  Ciencias: "/Capas de Livros/Ciencias.png",
-  Infantil: "/Capas de Livros/Infantil.png",
-};
+import {
+  getBookDetails,
+  sendLoanReminder,
+  returnBookLoan,
+  BookDetails,
+} from "@/services/bookDetailModal";
+import { categoryImageMap } from "@/lib/categoryMap";
 
 // Props expected by the BookDetailModal component
 interface BookDetailModalProps {
@@ -28,18 +24,22 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   onReturnSuccess,
 }) => {
   // Stores fetched book data
-  const {
-  book: livro,
-  loading,
-  reminderLoadingId: lembreteLoadingId,
-  returnLoadingId: devolucaoLoadingId,
-  fetchBook,
-  sendReminder: handleEnviarLembrete,
-  returnBook,
-} = useBookDetails()
+  const [livro, setLivro] = useState<BookDetails | null>(null);
+
+  // Controls loading state while fetching book details
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // Stores the loan id currently sending a reminder email
+  const [lembreteLoadingId, setLembreteLoadingId] = useState<string | null>(
+    null,
+  );
+
+  // Stores the loan id currently being returned
+  const [devolucaoLoadingId, setDevolucaoLoadingId] = useState<string | null>(
+    null,
+  );
 
   // Controls mobile layout behavior
-
   const [isMobile, setIsMobile] = useState(false);
 
   // Checks the screen width to adjust modal layout on small screens
@@ -50,10 +50,27 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
     return () => window.removeEventListener("resize", check);
   }, []);
 
+  // Fetches book details from the service
+  const buscarLivro = async () => {
+    try {
+      setLoading(true);
+
+      const livroDetalhado = await getBookDetails(id);
+      setLivro(livroDetalhado);
+    } catch (error) {
+      console.error("Erro ao buscar detalhes do livro:", error);
+      alert("Erro ao carregar detalhes do livro.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetches book details when the modal opens
   useEffect(() => {
-  if (isOpen && id) fetchBook(id)
-}, [isOpen, id])
+    if (isOpen && id) {
+      buscarLivro();
+    }
+  }, [isOpen, id]);
 
   // Prevents rendering if the modal is closed
   if (!isOpen) return null;
@@ -70,9 +87,42 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
     : [];
 
   // Sends a reminder email for overdue loans
-  const handleDevolver = (emprestimoId: string) => {
-  returnBook(emprestimoId, onReturnSuccess)
-}
+  const handleEnviarLembrete = async (emprestimoId: string) => {
+    try {
+      setLembreteLoadingId(emprestimoId);
+
+      await sendLoanReminder(emprestimoId);
+
+      alert("E-mail de lembrete enviado com sucesso.");
+    } catch (error) {
+      console.error("Erro ao enviar lembrete:", error);
+      alert("Falha ao enviar o e-mail de lembrete.");
+    } finally {
+      setLembreteLoadingId(null);
+    }
+  };
+
+  // Marks a loan as returned and refreshes the book details
+  const handleDevolver = async (emprestimoId: string) => {
+    try {
+      setDevolucaoLoadingId(emprestimoId);
+
+      await returnBookLoan(emprestimoId);
+
+      alert(
+        "Livro marcado como devolvido e e-mail de confirmação enviado com sucesso.",
+      );
+
+      await buscarLivro();
+
+      await onReturnSuccess?.();
+    } catch (error) {
+      console.error("Erro ao marcar como devolvido:", error);
+      alert("Falha ao marcar o livro como devolvido.");
+    } finally {
+      setDevolucaoLoadingId(null);
+    }
+  };
 
   return (
     <div style={styles.overlay} onClick={onClose}>
@@ -130,7 +180,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
                 }}
               >
                 <img
-                  src={capas[livro.categoria] || "/img/default.jpg"}
+                  src={categoryImageMap[livro.categoria] || "/img/default.jpg"}
                   alt={livro.titulo}
                   style={styles.coverImg}
                 />
