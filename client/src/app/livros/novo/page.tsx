@@ -135,7 +135,23 @@ export default function RegisterNewBook() {
       router.push("/livros");
     } catch (error) {
       console.error(error);
-      alert("Erro ao cadastrar livro.");
+
+      if (axios.isAxiosError(error)) {
+        const message =
+          error.response?.data?.message || "Erro ao cadastrar livro.";
+
+        setErrors((prev) => ({
+          ...prev,
+          isbn: `*${message}`,
+        }));
+
+        return;
+      }
+
+      setErrors((prev) => ({
+        ...prev,
+        isbn: "*Erro inesperado ao cadastrar livro.",
+      }));
     }
   }
 

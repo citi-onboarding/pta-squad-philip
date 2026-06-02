@@ -6,6 +6,12 @@ export const BookRepository = {
         return prisma.livro.create({data});
     },
 
+    findByIsbn: async (isbn: string): Promise<Livro | null> => {
+        return prisma.livro.findUnique({
+            where: { isbn },
+        });
+        },
+
     countActiveOrLateLoansByBookId: async (id: string): Promise<number> => {
     return prisma.emprestimo.count({
         where: {

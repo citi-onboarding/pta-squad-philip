@@ -12,7 +12,7 @@ export class DeleteBookService {
     const livro = await BookRepository.getById(id);
 
     if (!livro) {
-      throw new NotFoundError("Livro não encontrado.");
+      throw new NotFoundError("ID inexistente, livro não pode ser encontrado.");
     }
 
     const emprestimosAtivos =

@@ -37,6 +37,12 @@ export class CreateBookService {
       throw new ValidationError("O ISBN deve conter 10 ou 13 dígitos numéricos.");
     }
 
+    const livroComMesmoIsbn = await BookRepository.findByIsbn(String(isbn));
+
+    if (livroComMesmoIsbn) {
+      throw new ConflictError("Já existe um livro com este ISBN.");
+    }
+
     try {
       const livro = await BookRepository.create({
         titulo: String(titulo),
