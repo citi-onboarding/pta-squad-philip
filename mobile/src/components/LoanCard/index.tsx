@@ -1,6 +1,8 @@
 import { CalendarDays } from "lucide-react-native";
 import {
   Image,
+  ImageSourcePropType,
+  Platform,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -13,7 +15,7 @@ interface LoanCardProps {
   status: "Em_andamento" | "Devolvido" | "Atrasado";
   dataLocacao: string;
   dataPrevistaDevolucao: string;
-  imagemLivro: string;
+  imagemLivro?: ImageSourcePropType;
 }
 
 const statusConfig = {
@@ -58,16 +60,30 @@ export function LoanCard({
     <View style={styles.card}>
       <View style={styles.inner}>
         <View style={[styles.imageArea, { width: imageAreaWidth }]}>
-          <Image
-            source={{ uri: imagemLivro }}
-            style={[
-              styles.bookImage,
-              {
-                width: imageWidth,
-                height: imageHeight,
-              },
-            ]}
-          />
+          {imagemLivro ? (
+            <Image
+              source={imagemLivro}
+              style={[
+                styles.bookImage,
+                {
+                  width: imageWidth,
+                  height: imageHeight,
+                },
+              ]}
+            />
+          ) : (
+            <View
+              style={[
+                styles.bookImageFallback,
+                {
+                  width: imageWidth,
+                  height: imageHeight,
+                },
+              ]}
+            >
+              <Text style={styles.bookImageFallbackText}>Sem capa</Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.content}>
@@ -113,6 +129,7 @@ export function LoanCard({
           <View style={styles.dates}>
             <View style={styles.infoRow}>
               <CalendarDays size={isSmallScreen ? 13 : 14} color="#6B7280" />
+
               <Text
                 style={[styles.infoText, isSmallScreen && styles.infoTextSmall]}
                 numberOfLines={1}
@@ -123,6 +140,7 @@ export function LoanCard({
 
             <View style={styles.infoRow}>
               <CalendarDays size={isSmallScreen ? 13 : 14} color="#6B7280" />
+
               <Text
                 style={[styles.infoText, isSmallScreen && styles.infoTextSmall]}
                 numberOfLines={1}
@@ -146,14 +164,22 @@ const styles = StyleSheet.create({
     borderWidth: 0.83,
     borderColor: "#E5E7EB",
     padding: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 4,
+
+    ...Platform.select({
+      web: {
+        boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.12)",
+      },
+      default: {
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.12,
+        shadowRadius: 6,
+        elevation: 4,
+      },
+    }),
   },
 
   inner: {
@@ -171,6 +197,21 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     resizeMode: "cover",
     backgroundColor: "#E5E7EB",
+  },
+
+  bookImageFallback: {
+    borderRadius: 6,
+    backgroundColor: "#E5E7EB",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+
+  bookImageFallbackText: {
+    fontSize: 10,
+    lineHeight: 13,
+    color: "#6B7280",
+    textAlign: "center",
   },
 
   content: {
