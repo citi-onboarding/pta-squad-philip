@@ -13,6 +13,7 @@ import {
 } from "@expo-google-fonts/barlow";
 import { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
 import { MobileHeader } from "../src/components/MobileHeader";
 
@@ -42,28 +43,29 @@ export default function Layout() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea} edges={["top"]}>
-        <View style={styles.container} onLayout={onLayoutRootView}>
-          <MobileHeader />
+      <View style={styles.container} onLayout={onLayoutRootView}>
+        <StatusBar style="dark" />
 
-          <View style={styles.main}>
-            <Slot />
-          </View>
+        <SafeAreaView style={styles.headerSafeArea} edges={["top"]}>
+          <MobileHeader />
+        </SafeAreaView>
+
+        <View style={styles.main}>
+          <Slot />
         </View>
-      </SafeAreaView>
+      </View>
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
-
   container: {
     flex: 1,
     backgroundColor: "#F5F6F7",
+  },
+
+  headerSafeArea: {
+    backgroundColor: "#FFFFFF",
   },
 
   main: {
