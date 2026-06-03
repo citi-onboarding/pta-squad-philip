@@ -6,15 +6,7 @@ import {
   returnBookLoan,
   BookDetails,
 } from "@/services/bookDetailModal";
-
-// Static asset mapping matching book categories to local covers
-const capas: Record<string, string> = {
-  Romance: "/Capas de Livros/Romance.png",
-  Tecnologia: "/Capas de Livros/Tecnologia.png",
-  Historia: "/Capas de Livros/Historia.png",
-  Ciencias: "/Capas de Livros/Ciencias.png",
-  Infantil: "/Capas de Livros/Infantil.png",
-};
+import { categoryImageMap } from "@/lib/categoryMap";
 
 // Props expected by the BookDetailModal component
 interface BookDetailModalProps {
@@ -188,7 +180,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
                 }}
               >
                 <img
-                  src={capas[livro.categoria] || "/img/default.jpg"}
+                  src={categoryImageMap[livro.categoria] || "/img/default.jpg"}
                   alt={livro.titulo}
                   style={styles.coverImg}
                 />

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import type { FormEvent, ChangeEvent } from "react";
 import api from "@/services/api";
+import { categoryImageMap } from "@/lib/categoryMap";
 
 export interface FormDataProps {
   titulo: string;
@@ -135,7 +136,23 @@ export default function RegisterNewBook() {
       router.push("/livros");
     } catch (error) {
       console.error(error);
-      alert("Erro ao cadastrar livro.");
+
+      if (axios.isAxiosError(error)) {
+        const message =
+          error.response?.data?.message || "Erro ao cadastrar livro.";
+
+        setErrors((prev) => ({
+          ...prev,
+          isbn: `*${message}`,
+        }));
+
+        return;
+      }
+
+      setErrors((prev) => ({
+        ...prev,
+        isbn: "*Erro inesperado ao cadastrar livro.",
+      }));
     }
   }
 
@@ -146,14 +163,6 @@ export default function RegisterNewBook() {
     "Ciências",
     "Infantil",
   ];
-
-  const capas: Record<string, string> = {
-    Romance: "/Capas de Livros/Romance.png",
-    Tecnologia: "/Capas de Livros/Tecnologia.png",
-    Historia: "/Capas de Livros/Historia.png",
-    Ciencias: "/Capas de Livros/Ciencias.png",
-    Infantil: "/Capas de Livros/Infantil.png",
-  };
 
   const inputClass =
     "mt-1 block w-full rounded-md border border-slate-300 px-3 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#00C389] focus:outline-none focus:ring-1 focus:ring-[#00C389]";
@@ -297,7 +306,7 @@ export default function RegisterNewBook() {
                   <div className="flex w-[146.88px] h-[174.86px] flex-col items-center justify-end rounded-[8px] border-[1.67px] border-slate-200 bg-white px-[17.66px] pt-[17.66px] pb-[1.67px] text-sm text-slate-500 transition-all hover:bg-slate-50 peer-checked:border-[#00C389] peer-checked:bg-[#E6F9F0] peer-checked:font-medium peer-checked:text-[#00C389] gap-[8px]">
                     <img
                       src={
-                        capas[
+                        categoryImageMap[
                           cat.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
                         ]
                       }

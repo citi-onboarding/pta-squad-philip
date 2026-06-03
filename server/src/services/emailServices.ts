@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import path from "path";
+import { determinarStatusPorData, obterCoresStatusEmail } from "../utils/statusHelpers";
 
 type EnviarLembreteParams = {
   emailCliente: string;
@@ -161,6 +162,13 @@ export async function enviarLembrete({
 }: EnviarLembreteParams) {
   const dataFormatada = formatarData(dataPrevista);
 
+  const status = determinarStatusPorData(dataPrevista);
+  const { statusCor, statusFundo } = obterCoresStatusEmail(status);
+  
+  const subtitulo = status === "Atrasado"
+    ? "Um dos seus empréstimos ultrapassou a data de devolução."
+    : "Um dos seus empréstimos está próximo da data de devolução.";
+
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to: emailCliente,
@@ -169,11 +177,11 @@ export async function enviarLembrete({
     html: gerarTemplateEmail({
       nomeCliente,
       titulo: "Lembrete de devolução",
-      subtitulo: "Um dos seus empréstimos está próximo da data de devolução.",
+      subtitulo,
       tituloLivro,
-      status: "Em andamento",
-      statusCor: "#b77900",
-      statusFundo: "#fff4bd",
+      status,
+      statusCor,
+      statusFundo,
       mensagem: `Estamos entrando em contato para lembrar que o livro <strong>${tituloLivro}</strong> está com devolução prevista para <strong>${dataFormatada}</strong>.`,
       dataLabel: "Devolução prevista",
       dataValor: dataFormatada,

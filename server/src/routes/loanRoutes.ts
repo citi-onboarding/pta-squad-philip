@@ -1,5 +1,5 @@
 import express from "express";
-import emprestimoController from "src/controllers/emprestimo.controller";
+import emprestimoController from "../controllers/loanController";
 const emprestimoRoutes = express.Router();
 
 // empréstimo routes
