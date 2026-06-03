@@ -5,7 +5,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import type { FormEvent, ChangeEvent } from "react";
-import api from "@/services/api";
+import { createBook } from "@/services/books.service";
+import { categoryImageMap } from "@/lib/categoryMap";
 
 export interface FormDataProps {
   titulo: string;
@@ -120,11 +121,11 @@ export default function RegisterNewBook() {
 
     setErrors({});
     try {
-      await api.post("/livros", {
-        titulo: data.titulo,
-        autor: data.autor,
-        isbn: data.isbn,
-        editora: data.editora,
+      await createBook({
+        titulo: data.titulo as string,
+        autor: data.autor as string,
+        isbn: data.isbn as string,
+        editora: data.editora as string,
         ano: Number(data.ano),
         quantidade_total: Number(data.quantidade),
         categoria: (data.categoria as string)
@@ -135,7 +136,23 @@ export default function RegisterNewBook() {
       router.push("/livros");
     } catch (error) {
       console.error(error);
-      alert("Erro ao cadastrar livro.");
+
+      if (axios.isAxiosError(error)) {
+        const message =
+          error.response?.data?.message || "Erro ao cadastrar livro.";
+
+        setErrors((prev) => ({
+          ...prev,
+          isbn: `*${message}`,
+        }));
+
+        return;
+      }
+
+      setErrors((prev) => ({
+        ...prev,
+        isbn: "*Erro inesperado ao cadastrar livro.",
+      }));
     }
   }
 
@@ -146,14 +163,6 @@ export default function RegisterNewBook() {
     "Ciências",
     "Infantil",
   ];
-
-  const capas: Record<string, string> = {
-    Romance: "/Capas de Livros/Romance.png",
-    Tecnologia: "/Capas de Livros/Tecnologia.png",
-    Historia: "/Capas de Livros/Historia.png",
-    Ciencias: "/Capas de Livros/Ciencias.png",
-    Infantil: "/Capas de Livros/Infantil.png",
-  };
 
   const inputClass =
     "mt-1 block w-full rounded-md border border-slate-300 px-3 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#00C389] focus:outline-none focus:ring-1 focus:ring-[#00C389]";
@@ -174,9 +183,9 @@ export default function RegisterNewBook() {
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="flex flex-col gap-[32px] rounded-lg border border-slate-200 bg-white pt-[32px] pb-8 px-6 shadow-md"
+          className="flex flex-col gap-[16px] rounded-lg border border-slate-200 bg-white pt-[32px] pb-8 px-6 shadow-md"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-[32px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px] md:gap-[32px]">
             <div>
               <label htmlFor="titulo" className={labelClass}>
                 Título
@@ -189,9 +198,7 @@ export default function RegisterNewBook() {
                 placeholder="Digite o título do livro"
                 onChange={handleChange}
               />
-              {errors.titulo && (
-                <p className="text-xs text-red-500 mt-1">{errors.titulo}</p>
-              )}
+              <p className="text-xs text-red-500 mt-1 min-h-[16px]">{errors.titulo}</p>
             </div>
 
             <div>
@@ -205,10 +212,8 @@ export default function RegisterNewBook() {
                 className={inputClass}
                 placeholder="Digite o nome do autor"
                 onChange={handleChange}
-              />
-              {errors.autor && (
-                <p className="text-xs text-red-500 mt-1">{errors.autor}</p>
-              )}
+                />
+              <p className="text-xs text-red-500 mt-1 min-h-[16px]">{errors.autor}</p>
             </div>
 
             <div>
@@ -223,9 +228,7 @@ export default function RegisterNewBook() {
                 placeholder="Digite o ISBN"
                 onChange={handleChange}
               />
-              {errors.isbn && (
-                <p className="text-xs text-red-500 mt-1">{errors.isbn}</p>
-              )}
+              <p className="text-xs text-red-500 mt-1 min-h-[16px]">{errors.isbn}</p>
             </div>
 
             <div>
@@ -240,9 +243,7 @@ export default function RegisterNewBook() {
                 placeholder="Digite a editora"
                 onChange={handleChange}
               />
-              {errors.editora && (
-                <p className="text-xs text-red-500 mt-1">{errors.editora}</p>
-              )}
+              <p className="text-xs text-red-500 mt-1 min-h-[16px]">{errors.editora}</p>
             </div>
 
             <div>
@@ -257,9 +258,7 @@ export default function RegisterNewBook() {
                 placeholder="Digite o ano"
                 onChange={handleChange}
               />
-              {errors.ano && (
-                <p className="text-xs text-red-500 mt-1">{errors.ano}</p>
-              )}
+              <p className="text-xs text-red-500 mt-1 min-h-[16px]">{errors.ano}</p>
             </div>
 
             <div>
@@ -274,9 +273,7 @@ export default function RegisterNewBook() {
                 placeholder="Digite a quantidade"
                 onChange={handleChange}
               />
-              {errors.quantidade && (
-                <p className="text-xs text-red-500 mt-1">{errors.quantidade}</p>
-              )}
+              <p className="text-xs text-red-500 mt-1 min-h-[16px]">{errors.quantidade}</p>
             </div>
           </div>
 
@@ -297,7 +294,7 @@ export default function RegisterNewBook() {
                   <div className="flex w-[146.88px] h-[174.86px] flex-col items-center justify-end rounded-[8px] border-[1.67px] border-slate-200 bg-white px-[17.66px] pt-[17.66px] pb-[1.67px] text-sm text-slate-500 transition-all hover:bg-slate-50 peer-checked:border-[#00C389] peer-checked:bg-[#E6F9F0] peer-checked:font-medium peer-checked:text-[#00C389] gap-[8px]">
                     <img
                       src={
-                        capas[
+                        categoryImageMap[
                           cat.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
                         ]
                       }
@@ -310,9 +307,7 @@ export default function RegisterNewBook() {
                 </label>
               ))}
             </div>
-            {errors.categoria && (
-              <p className="text-xs text-red-500 mt-2">{errors.categoria}</p>
-            )}
+            <p className="text-xs text-red-500 mt-1 min-h-[16px]">{errors.categoria}</p>
           </div>
 
           <div className="mt-4 flex flex-col md:flex-row md:justify-end gap-4 border-t border-slate-100 pt-6">

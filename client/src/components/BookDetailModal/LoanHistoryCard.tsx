@@ -7,45 +7,45 @@ import { useState, useEffect } from "react";
 // Defines the props expected by the LoanHistoryCard component
 interface LoanHistoryCardProps {
   id: string;
-  nomeCliente: string;
-  emailCliente: string;
-  dataLocacao: string;
-  dataPrevistaDevolucao: string;
+  clientName: string;
+  clientEmail: string;
+  loanDate: string;
+  expectedReturnDate: string;
   status: "Em_andamento" | "Em andamento" | "Devolvido" | "Atrasado";
   // Function called when sending a reminder
-  onEnviarLembrete: (id: string) => void;
+  onSendReminder: (id: string) => void;
   // Function called when marking a loan as returned
-  onDevolver: (id: string) => void;
+  onReturn: (id: string) => void;
   // Controls loading state for the reminder button
-  lembreteLoading: boolean;
+  reminderLoading: boolean;
   // Controls loading state for the return button
-  devolucaoLoading: boolean;
+  returnLoading: boolean;
 }
 
 // Loan history card component
 export const LoanHistoryCard: React.FC<LoanHistoryCardProps> = ({
   id,
-  nomeCliente,
-  emailCliente,
-  dataLocacao,
-  dataPrevistaDevolucao,
+  clientName,
+  clientEmail,
+  loanDate,
+  expectedReturnDate,
   status,
-  onEnviarLembrete,
-  onDevolver,
-  lembreteLoading,
-  devolucaoLoading,
+  onSendReminder,
+  onReturn,
+  reminderLoading,
+  returnLoading,
 }) => {
   // Format database status string to a user-friendly UI text
-  const statusFormatado = status === "Em_andamento" ? "Em andamento" : status;
+  const formattedStatus = status === "Em_andamento" ? "Em andamento" : status;
 
   // Checks which actions are available according to loan status
-  const isAtrasado = status === "Atrasado";
-  const isEmAndamento = status === "Em_andamento" || status === "Em andamento";
-  const podeEnviarLembrete = isAtrasado;
-  const podeMarcarComoDevolvido = isAtrasado || isEmAndamento;
+  const isLate = status === "Atrasado";
+  const isInProgress = status === "Em_andamento" || status === "Em andamento";
+  const canSendReminder = isLate;
+  const canMarkAsReturned = isLate || isInProgress;
 
   // Format the date strings to Brazilian localized date format
-  const formatarData = (dataStr: string) => {
+  const formatDate = (dataStr: string) => {
     return new Date(dataStr).toLocaleDateString("pt-BR", { timeZone: "UTC" });
   };
 
@@ -79,11 +79,11 @@ export const LoanHistoryCard: React.FC<LoanHistoryCardProps> = ({
             flexWrap: isMobile ? "wrap" : "nowrap",
           }}
         >
-          <span style={styles.name}>{nomeCliente}</span>
-          <Badge status={statusFormatado as any} text={statusFormatado} />
+          <span style={styles.name}>{clientName}</span>
+          <Badge status={formattedStatus as any} />
         </div>
 
-        <p style={styles.email}>{emailCliente}</p>
+        <p style={styles.email}>{clientEmail}</p>
 
         {/* Dates displayed as separated groups to avoid bad line breaks on mobile */}
         <div
@@ -96,13 +96,13 @@ export const LoanHistoryCard: React.FC<LoanHistoryCardProps> = ({
         >
           <div style={styles.dateGroup}>
             <span style={styles.dateLabel}>Locação:</span>
-            <span style={styles.dateValue}>{formatarData(dataLocacao)}</span>
+            <span style={styles.dateValue}>{formatDate(loanDate)}</span>
           </div>
 
           <div style={styles.dateGroup}>
             <span style={styles.dateLabel}>Previsão:</span>
             <span style={styles.dateValue}>
-              {formatarData(dataPrevistaDevolucao)}
+              {formatDate(expectedReturnDate)}
             </span>
           </div>
         </div>
@@ -119,36 +119,36 @@ export const LoanHistoryCard: React.FC<LoanHistoryCardProps> = ({
           justifyContent: isMobile ? "flex-start" : "flex-end",
         }}
       >
-        {podeEnviarLembrete && (
+        {canSendReminder && (
           <Button
             style={{
               ...styles.btnReminder,
               width: isMobile ? "100%" : "auto",
               cursor:
-                lembreteLoading || devolucaoLoading ? "not-allowed" : "pointer",
-              opacity: lembreteLoading || devolucaoLoading ? 0.7 : 1,
+                reminderLoading || returnLoading ? "not-allowed" : "pointer",
+              opacity: reminderLoading || returnLoading ? 0.7 : 1,
             }}
-            onClick={() => onEnviarLembrete(id)}
-            disabled={lembreteLoading || devolucaoLoading}
+            onClick={() => onSendReminder(id)}
+            disabled={reminderLoading || returnLoading}
           >
             <Mail size={16} strokeWidth={2} />
-            {lembreteLoading ? "Enviando..." : "Enviar Lembrete"}
+            {reminderLoading ? "Enviando..." : "Enviar Lembrete"}
           </Button>
         )}
 
-        {podeMarcarComoDevolvido && (
+        {canMarkAsReturned && (
           <Button
             style={{
               ...styles.btnReturn,
               width: isMobile ? "100%" : "auto",
               cursor:
-                devolucaoLoading || lembreteLoading ? "not-allowed" : "pointer",
-              opacity: devolucaoLoading || lembreteLoading ? 0.7 : 1,
+                returnLoading || reminderLoading ? "not-allowed" : "pointer",
+              opacity: returnLoading || reminderLoading ? 0.7 : 1,
             }}
-            onClick={() => onDevolver(id)}
-            disabled={devolucaoLoading || lembreteLoading}
+            onClick={() => onReturn(id)}
+            disabled={returnLoading || reminderLoading}
           >
-            {devolucaoLoading ? "Processando..." : "Marcar como Devolvido"}
+            {returnLoading ? "Processando..." : "Marcar como Devolvido"}
           </Button>
         )}
       </div>
