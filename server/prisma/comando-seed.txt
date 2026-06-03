@@ -1,0 +1,2 @@
+1. Troque o DATABASE_URL em .env para: postgres://postgres:docker@localhost:5432/pta
+2. No server rode: npx tsx --env-file=.env ./prisma/seed.ts
