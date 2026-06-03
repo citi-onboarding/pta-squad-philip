@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -8,7 +8,7 @@ import {
   DialogOverlay,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 import {
   Drawer,
@@ -16,7 +16,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from "@/components/ui/drawer"
+} from "@/components/ui/drawer";
 
 import { useIsMobile } from "../../hooks/useMobile";
 import { Input } from "../ui/input";
@@ -26,117 +26,133 @@ import { useState } from "react";
 import { Separator } from "../ui/separator";
 
 interface LoanFormData {
-  clientName: string
-  clientEmail: string
-  loanDate: string
-  returnDate: string
+  clientName: string;
+  clientEmail: string;
+  loanDate: string;
+  returnDate: string;
 }
 
 interface LoanFormErrors {
-  clientName?: string
-  clientEmail?: string
-  loanDate?: string
-  returnDate?: string
+  clientName?: string;
+  clientEmail?: string;
+  loanDate?: string;
+  returnDate?: string;
 }
 
 interface LoanModalProps {
-  open: boolean
-  onOpenChange: (isOpen: boolean) => void
-  bookTitle: string
+  open: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  bookTitle: string;
   apiError: string | null;
-  onConfirm: (data: { clientName: string; clientEmail: string; loanDate: string; expectedReturnDate: string }) => Promise<void>;
+  onConfirm: (data: {
+    clientName: string;
+    clientEmail: string;
+    loanDate: string;
+    expectedReturnDate: string;
+  }) => Promise<void>;
 }
 
-export function LoanModal({ open, onOpenChange, bookTitle, apiError, onConfirm }: LoanModalProps) {
-  
+export function LoanModal({
+  open,
+  onOpenChange,
+  bookTitle,
+  apiError,
+  onConfirm,
+}: LoanModalProps) {
   const [formData, setFormData] = useState<LoanFormData>({
     clientName: "",
     clientEmail: "",
     loanDate: "",
-    returnDate: "", 
-  })
+    returnDate: "",
+  });
 
-  const [errors, setErrors] = useState<LoanFormErrors>({})
+  const [errors, setErrors] = useState<LoanFormErrors>({});
 
-  const isMobile = useIsMobile() 
-  
+  const isMobile = useIsMobile();
+
   const validateField = (name: keyof LoanFormData, value: string) => {
-    const updatedData = { ...formData, [name]: value }
-    const newErrors = { ...errors }
+    const updatedData = { ...formData, [name]: value };
+    const newErrors = { ...errors };
 
     switch (name) {
       case "clientName":
-        if (!value) newErrors.clientName = "Nome é obrigatório"
-        else delete newErrors.clientName
-        break
+        if (!value) newErrors.clientName = "Nome é obrigatório";
+        else delete newErrors.clientName;
+        break;
 
       case "clientEmail":
-        if (!value) newErrors.clientEmail = "Email é obrigatório"
+        if (!value) newErrors.clientEmail = "Email é obrigatório";
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-          newErrors.clientEmail = "Email inválido"
-        else delete newErrors.clientEmail
-        break
+          newErrors.clientEmail = "Email inválido";
+        else delete newErrors.clientEmail;
+        break;
 
       case "loanDate":
-        if (!value) newErrors.loanDate = "Data de locação é obrigatória"
-        else delete newErrors.loanDate
+        if (!value) newErrors.loanDate = "Data de locação é obrigatória";
+        else delete newErrors.loanDate;
 
         if (!updatedData.returnDate)
-          newErrors.returnDate = "Data de devolução é obrigatória"
+          newErrors.returnDate = "Data de devolução é obrigatória";
         else if (updatedData.returnDate < value)
-          newErrors.returnDate = "Data de devolução não pode ser anterior à de locação"
-        else delete newErrors.returnDate
-        break
+          newErrors.returnDate =
+            "Data de devolução não pode ser anterior à de locação";
+        else delete newErrors.returnDate;
+        break;
 
       case "returnDate":
-        if (!value) newErrors.returnDate = "Data de devolução é obrigatória"
+        if (!value) newErrors.returnDate = "Data de devolução é obrigatória";
         else if (value < updatedData.loanDate)
-          newErrors.returnDate = "Data de devolução não pode ser anterior à de locação"
-        else delete newErrors.returnDate
-        break
+          newErrors.returnDate =
+            "Data de devolução não pode ser anterior à de locação";
+        else delete newErrors.returnDate;
+        break;
     }
 
-    setErrors(newErrors)
-  }
+    setErrors(newErrors);
+  };
 
   const submitLoan = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const newErrors: LoanFormErrors = {}
+    const newErrors: LoanFormErrors = {};
 
-    if (!formData.clientName)
-      newErrors.clientName = "Nome é obrigatório"
+    if (!formData.clientName) newErrors.clientName = "Nome é obrigatório";
 
-    if (!formData.clientEmail)
-      newErrors.clientEmail = "Email é obrigatório"
+    if (!formData.clientEmail) newErrors.clientEmail = "Email é obrigatório";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.clientEmail))
-      newErrors.clientEmail = "Email inválido"
+      newErrors.clientEmail = "Email inválido";
 
     if (!formData.loanDate)
-      newErrors.loanDate = "Data de locação é obrigatória"
+      newErrors.loanDate = "Data de locação é obrigatória";
 
     if (!formData.returnDate)
-      newErrors.returnDate = "Data de devolução é obrigatória"
+      newErrors.returnDate = "Data de devolução é obrigatória";
     else if (formData.returnDate < formData.loanDate)
-      newErrors.returnDate = "Data de devolução não pode ser anterior à de locação"
+      newErrors.returnDate =
+        "Data de devolução não pode ser anterior à de locação";
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
+      setErrors(newErrors);
+      return;
     }
     await onConfirm({
       clientName: formData.clientName,
       clientEmail: formData.clientEmail,
       expectedReturnDate: formData.returnDate,
       loanDate: formData.loanDate,
-      })
-  }
+    });
+  };
 
   const handleClose = () => {
-    setFormData({ clientName: "", clientEmail: "", loanDate: "", returnDate: "" })
-    setErrors({})
-    onOpenChange(false)
-  }
+    setFormData({
+      clientName: "",
+      clientEmail: "",
+      loanDate: "",
+      returnDate: "",
+    });
+    setErrors({});
+    onOpenChange(false);
+  };
 
   if (isMobile) {
     return (
@@ -144,7 +160,10 @@ export function LoanModal({ open, onOpenChange, bookTitle, apiError, onConfirm }
         <DrawerContent>
           <DrawerHeader className="flex justify-between items-center">
             <DrawerTitle className="text-2xl">Realizar empréstimo</DrawerTitle>
-            <DrawerClose onClick={handleClose} className="p-2 hover:bg-[#f0f0f0] hover:duration-200 rounded-lg">
+            <DrawerClose
+              onClick={handleClose}
+              className="p-2 hover:bg-[#f0f0f0] hover:duration-200 rounded-lg"
+            >
               <X className="w-5 h-5 text-[#717182]" />
             </DrawerClose>
           </DrawerHeader>
@@ -155,7 +174,7 @@ export function LoanModal({ open, onOpenChange, bookTitle, apiError, onConfirm }
               <span className="text-[#1E1E1E] text-md">{bookTitle}</span>
             </div>
 
-            <form onSubmit={submitLoan} className="flex flex-col gap-4">
+            <form onSubmit={submitLoan} className="flex flex-col gap-2">
               <Field>
                 <FieldLabel>Nome do Cliente</FieldLabel>
                 <Input
@@ -164,11 +183,13 @@ export function LoanModal({ open, onOpenChange, bookTitle, apiError, onConfirm }
                   placeholder="Digite o nome do cliente"
                   value={formData.clientName}
                   onChange={(e) => {
-                    setFormData({ ...formData, clientName: e.target.value })
-                    validateField("clientName", e.target.value)
+                    setFormData({ ...formData, clientName: e.target.value });
+                    validateField("clientName", e.target.value);
                   }}
                 />
-                <FieldError>{errors.clientName}</FieldError>
+                <div className="min-h-[20px]">
+                  <FieldError>{errors.clientName}</FieldError>
+                </div>
               </Field>
 
               <Field>
@@ -179,11 +200,13 @@ export function LoanModal({ open, onOpenChange, bookTitle, apiError, onConfirm }
                   placeholder="Digite o email do cliente"
                   value={formData.clientEmail}
                   onChange={(e) => {
-                    setFormData({ ...formData, clientEmail: e.target.value })
-                    validateField("clientEmail", e.target.value)
+                    setFormData({ ...formData, clientEmail: e.target.value });
+                    validateField("clientEmail", e.target.value);
                   }}
                 />
-                <FieldError>{errors.clientEmail}</FieldError>
+                <div className="min-h-[20px]">
+                  <FieldError>{errors.clientEmail}</FieldError>
+                </div>
               </Field>
 
               <Field>
@@ -193,11 +216,13 @@ export function LoanModal({ open, onOpenChange, bookTitle, apiError, onConfirm }
                   type="date"
                   value={formData.loanDate}
                   onChange={(e) => {
-                    setFormData({ ...formData, loanDate: e.target.value })
-                    validateField("loanDate", e.target.value)
+                    setFormData({ ...formData, loanDate: e.target.value });
+                    validateField("loanDate", e.target.value);
                   }}
                 />
-                <FieldError>{errors.loanDate}</FieldError>
+                <div className="min-h-[20px]">
+                  <FieldError>{errors.loanDate}</FieldError>
+                </div>
               </Field>
 
               <Field>
@@ -207,11 +232,13 @@ export function LoanModal({ open, onOpenChange, bookTitle, apiError, onConfirm }
                   type="date"
                   value={formData.returnDate}
                   onChange={(e) => {
-                    setFormData({ ...formData, returnDate: e.target.value })
-                    validateField("returnDate", e.target.value)
+                    setFormData({ ...formData, returnDate: e.target.value });
+                    validateField("returnDate", e.target.value);
                   }}
                 />
-                <FieldError>{errors.returnDate}</FieldError>
+                <div className="min-h-[20px]">
+                  <FieldError>{errors.returnDate}</FieldError>
+                </div>
               </Field>
 
               <Separator />
@@ -222,120 +249,139 @@ export function LoanModal({ open, onOpenChange, bookTitle, apiError, onConfirm }
               )}
               <div className="flex w-full justify-center items-center gap-2 pb-4"></div>
               <div className="flex w-full justify-center items-center gap-2 pb-4">
-                <Button onClick={handleClose} type="button" className="bg-white border border-solid border-[#00C389] rounded-lg text-[#00C389] text-lg">Cancelar</Button>
-                <Button type="submit" className="bg-[#00C389] border border-solid rounded-lg text-white text-lg">Confirmar Empréstimo</Button>
+                <Button
+                  onClick={handleClose}
+                  type="button"
+                  className="bg-white border border-solid border-[#00C389] rounded-lg text-[#00C389] text-lg"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-[#00C389] border border-solid rounded-lg text-white text-lg"
+                >
+                  Confirmar Empréstimo
+                </Button>
               </div>
             </form>
           </div>
         </DrawerContent>
       </Drawer>
-    )
+    );
   }
 
   return (
-  <Dialog open={open} onOpenChange={handleClose}>
-    <DialogOverlay className="backdrop-blur-sm bg-black/20" />
-    <DialogContent className="max-w-[393px] [&>button]:hidden">
-      <DialogHeader className="flex justify-between">
-        <DialogTitle className="text-2xl flex justify-between">
-          Realizar empréstimo
-          <DialogClose className="p-2 hover:bg-[#f0f0f0] hover:duration-200 rounded-lg">
-            <X className="w-5 h-5 text-[#717182]" />
-          </DialogClose>
-        </DialogTitle>
-      </DialogHeader>
-
-      <Separator />
-
-      <div className="bg-[#F7F9FA] flex flex-col items-start justify-center p-6 rounded-lg mb-2">
-        <p className="text-[#717182] text-sm">Livro selecionado:</p>
-        <span className="text-[#1E1E1E] text-md">{bookTitle}</span>
-      </div>
-
-      <form onSubmit={submitLoan} className="flex flex-col gap-4">
-        <Field>
-          <FieldLabel>Nome do Cliente</FieldLabel>
-          <Input
-            className="h-12"
-            type="text"
-            placeholder="Digite o nome do cliente"
-            value={formData.clientName}
-            onChange={(e) => {
-              setFormData({ ...formData, clientName: e.target.value });
-              validateField("clientName", e.target.value);
-            }}
-          />
-          <FieldError>{errors.clientName}</FieldError>
-        </Field>
-
-        <Field>
-          <FieldLabel>Email do Cliente</FieldLabel>
-          <Input
-            className="h-12"
-            type="text"
-            placeholder="Digite o email do cliente"
-            value={formData.clientEmail}
-            onChange={(e) => {
-              setFormData({ ...formData, clientEmail: e.target.value });
-              validateField("clientEmail", e.target.value);
-            }}
-          />
-          <FieldError>{errors.clientEmail}</FieldError>
-        </Field>
-
-        <Field>
-          <FieldLabel>Data da Locação</FieldLabel>
-          <Input
-            className="h-12 text-[#9CA3AF]"
-            type="date"
-            value={formData.loanDate}
-            onChange={(e) => {
-              setFormData({ ...formData, loanDate: e.target.value });
-              validateField("loanDate", e.target.value);
-            }}
-          />
-          <FieldError>{errors.loanDate}</FieldError>
-        </Field>
-
-        <Field>
-          <FieldLabel>Data da Devolução</FieldLabel>
-          <Input
-            className="h-12 text-[#9CA3AF]"
-            type="date"
-            value={formData.returnDate}
-            onChange={(e) => {
-              setFormData({ ...formData, returnDate: e.target.value });
-              validateField("returnDate", e.target.value);
-            }}
-          />
-          <FieldError>{errors.returnDate}</FieldError>
-        </Field>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogOverlay className="backdrop-blur-sm bg-black/20" />
+      <DialogContent className="max-w-[393px] [&>button]:hidden">
+        <DialogHeader className="flex justify-between">
+          <DialogTitle className="text-2xl flex justify-between">
+            Realizar empréstimo
+            <DialogClose className="p-2 hover:bg-[#f0f0f0] hover:duration-200 rounded-lg">
+              <X className="w-5 h-5 text-[#717182]" />
+            </DialogClose>
+          </DialogTitle>
+        </DialogHeader>
 
         <Separator />
 
-        {apiError && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm font-medium w-full">
-            {apiError}
-          </div>
-        )}
-
-        <div className="flex w-full justify-center items-center gap-2">
-          <Button
-            onClick={handleClose}
-            type="button"
-            className="bg-white border border-solid border-slate-200 text-black"
-          >
-            Cancelar
-          </Button>
-          <Button
-            type="submit"
-            className="bg-[#00C389] border border-solid rounded-lg text-white font-medium"
-          >
-            Confirmar Empréstimo
-          </Button>
+        <div className="bg-[#F7F9FA] flex flex-col items-start justify-center p-6 rounded-lg mb-2">
+          <p className="text-[#717182] text-sm">Livro selecionado:</p>
+          <span className="text-[#1E1E1E] text-md">{bookTitle}</span>
         </div>
-      </form>
 
-    </DialogContent>
-  </Dialog>
-);}
+        <form onSubmit={submitLoan} className="flex flex-col gap-2">
+          <Field>
+            <FieldLabel>Nome do Cliente</FieldLabel>
+            <Input
+              className="h-12"
+              type="text"
+              placeholder="Digite o nome do cliente"
+              value={formData.clientName}
+              onChange={(e) => {
+                setFormData({ ...formData, clientName: e.target.value });
+                validateField("clientName", e.target.value);
+              }}
+            />
+            <div className="min-h-[20px]">
+              <FieldError>{errors.clientName}</FieldError>
+            </div>
+          </Field>
+
+          <Field>
+            <FieldLabel>Email do Cliente</FieldLabel>
+            <Input
+              className="h-12"
+              type="text"
+              placeholder="Digite o email do cliente"
+              value={formData.clientEmail}
+              onChange={(e) => {
+                setFormData({ ...formData, clientEmail: e.target.value });
+                validateField("clientEmail", e.target.value);
+              }}
+            />
+            <div className="min-h-[20px]">
+              <FieldError>{errors.clientEmail}</FieldError>
+            </div>
+          </Field>
+
+          <Field>
+            <FieldLabel>Data da Locação</FieldLabel>
+            <Input
+              className="h-12 text-[#9CA3AF]"
+              type="date"
+              value={formData.loanDate}
+              onChange={(e) => {
+                setFormData({ ...formData, loanDate: e.target.value });
+                validateField("loanDate", e.target.value);
+              }}
+            />
+            <div className="min-h-[20px]">
+              <FieldError>{errors.loanDate}</FieldError>
+            </div>
+          </Field>
+
+          <Field>
+            <FieldLabel>Data da Devolução</FieldLabel>
+            <Input
+              className="h-12 text-[#9CA3AF]"
+              type="date"
+              value={formData.returnDate}
+              onChange={(e) => {
+                setFormData({ ...formData, returnDate: e.target.value });
+                validateField("returnDate", e.target.value);
+              }}
+            />
+            <div className="min-h-[20px]">
+              <FieldError>{errors.returnDate}</FieldError>
+            </div>
+          </Field>
+
+          <Separator />
+
+          {apiError && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm font-medium w-full">
+              {apiError}
+            </div>
+          )}
+
+          <div className="flex w-full justify-center items-center gap-2">
+            <Button
+              onClick={handleClose}
+              type="button"
+              className="bg-white border border-solid border-slate-200 text-black"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              className="bg-[#00C389] border border-solid rounded-lg text-white font-medium"
+            >
+              Confirmar Empréstimo
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -68,7 +68,8 @@ export function BookCard({
           iconPosition="left"
           onClick={onBorrow}
           variantColor="bg-[#00C389] text-white hover:bg-[#00b07d]"
-          className="flex-1 text-sm"
+          className="flex-1 text-sm disabled:bg-gray-300 disabled:text-gray-500 disabled:border-gray-300"
+          disabled={availableQuantity === 0}
         />
 
         <Button
