@@ -27,7 +27,7 @@ export function BookCard({
   const isOutOfStock = availableQuantity === 0;
 
   return (
-    <article className="flex w-full max-w-[390px] flex-col rounded-md border border-slate-200 bg-white p-4 shadow-md">
+    <article className="flex w-full max-w-[395px] flex-col rounded-md border border-slate-200 bg-white p-4 shadow-md">
       <div className="mb-4 aspect-[1/1] w-full overflow-hidden rounded bg-slate-100">
         {imageUrl ? (
           <img
