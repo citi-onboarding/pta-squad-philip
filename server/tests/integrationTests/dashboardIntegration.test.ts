@@ -1,6 +1,6 @@
 import request from "supertest";
-import { app } from "../src/server";
-import prisma from "../src/database";
+import { app } from "../../src/server";
+import prisma from "../../src/database";
 
 beforeAll(async () => {
   const livro1 = await prisma.livro.create({
