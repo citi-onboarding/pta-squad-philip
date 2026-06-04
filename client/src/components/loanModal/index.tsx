@@ -24,6 +24,7 @@ import { X } from "lucide-react";
 import { Field, FieldLabel, FieldError } from "../ui/field";
 import { useState } from "react";
 import { Separator } from "../ui/separator";
+import { primaryActionButton, secondaryActionButton } from "@/lib/animations";
 
 interface LoanFormData {
   clientName: string;
@@ -252,13 +253,13 @@ export function LoanModal({
                 <Button
                   onClick={handleClose}
                   type="button"
-                  className="bg-white border border-solid border-[#00C389] rounded-lg text-[#00C389] text-lg"
+                  className={`bg-white border border-solid border-[#00C389] rounded-lg text-[#00C389] text-lg ${secondaryActionButton}`}
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-[#00C389] border border-solid rounded-lg text-white text-lg"
+                  className={`bg-[#00C389] border border-solid rounded-lg text-white text-lg  ${primaryActionButton}`}
                 >
                   Confirmar Empréstimo
                 </Button>
@@ -369,13 +370,13 @@ export function LoanModal({
             <Button
               onClick={handleClose}
               type="button"
-              className="bg-white border border-solid border-slate-200 text-black"
+              className={`bg-white border border-solid border-slate-200 text-black hover:border-[#00C389] hover:text-[#00C389] ${secondaryActionButton}`}
             >
               Cancelar
             </Button>
             <Button
               type="submit"
-              className="bg-[#00C389] border border-solid rounded-lg text-white font-medium"
+              className={`bg-[#00C389] border border-solid rounded-lg text-white font-medium hover:bg-[#00b07d] ${primaryActionButton}`}
             >
               Confirmar Empréstimo
             </Button>

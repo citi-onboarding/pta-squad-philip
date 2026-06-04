@@ -33,4 +33,17 @@ export const DashboardRepository = {
       _sum: { quantidade_total: true },
     });
   },
+
+  getLoansWithBooksForCharts: async () => {
+    return prisma.emprestimo.findMany({
+      select: {
+        livro: {
+          select: {
+            titulo: true,
+            categoria: true,
+          },
+        },
+      },
+    });
+  },
 };
