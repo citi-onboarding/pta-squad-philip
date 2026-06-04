@@ -48,7 +48,7 @@ export default function LivrosPage() {
         nome_cliente: data.clientName,
         email_cliente: data.clientEmail,
         data_prevista_devolucao: dataObjeto.toLocaleDateString("sv-SE"),
-        data_locacao: new Date().toISOString(),
+        data_locacao: new Date(`${data.loanDate}T12:00:00`).toISOString(),
       });
 
       setLoanOpen(false);
