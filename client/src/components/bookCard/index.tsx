@@ -32,6 +32,8 @@ export function BookCard({
 }: BookCardProps) {
   const isOutOfStock = availableQuantity === 0;
 
+  const isOutOfStock = availableQuantity === 0;
+
   return (
     <article
       className={`flex w-full max-w-[395px] flex-col rounded-md border border-slate-200 bg-white p-4 shadow-md ${interactiveCard}`}
@@ -54,11 +56,18 @@ export function BookCard({
         <h3 className="line-clamp-2 text-base font-semibold leading-snug text-slate-900">
           {title}
         </h3>
+      <div className="mb-5 flex flex-col gap-2">
+        <h3 className="line-clamp-2 text-base font-semibold leading-snug text-slate-900">
+          {title}
+        </h3>
 
+        <p className="text-sm text-slate-500">{author}</p>
         <p className="text-sm text-slate-500">{author}</p>
 
         <p className="text-xs font-semibold text-[#00C389]">{category}</p>
+        <p className="text-xs font-semibold text-[#00C389]">{category}</p>
 
+        <p className="text-xs font-semibold text-slate-800">
         <p className="text-xs font-semibold text-slate-800">
           Disponível: {availableQuantity} unidade(s)
         </p>

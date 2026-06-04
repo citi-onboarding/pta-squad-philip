@@ -39,11 +39,13 @@ export default function RegisterNewBook() {
             : (newErrors.titulo = "*Este é um campo obrigatório.");
           break;
 
+
         case "autor":
           value
             ? delete newErrors.autor
             : (newErrors.autor = "*Este é um campo obrigatório.");
           break;
+
 
         case "isbn":
           if (!value) newErrors.isbn = "*Este é um campo obrigatório.";
@@ -52,11 +54,13 @@ export default function RegisterNewBook() {
           else delete newErrors.isbn;
           break;
 
+
         case "editora":
           value
             ? delete newErrors.editora
             : (newErrors.editora = "*Este é um campo obrigatório.");
           break;
+
 
         case "ano":
           if (!value) newErrors.ano = "*Este é um campo obrigatório.";
@@ -74,6 +78,7 @@ export default function RegisterNewBook() {
             newErrors.quantidade = "*A quantidade deve ser maior que zero.";
           else delete newErrors.quantidade;
           break;
+
 
         case "categoria":
           value
@@ -93,10 +98,12 @@ export default function RegisterNewBook() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
+
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
     const newErrors: Record<string, string> = {};
+    const isbnRegex = /^(\d{10}|\d{13})$/;
     const isbnRegex = /^(\d{10}|\d{13})$/;
 
     if (!data.titulo) newErrors.titulo = "*Este é um campo obrigatório.";
@@ -109,6 +116,7 @@ export default function RegisterNewBook() {
     }
 
     if (!data.editora) newErrors.editora = "*Este é um campo obrigatório.";
+
 
     if (!data.ano) {
       newErrors.ano = "*Este é um campo obrigatório.";
@@ -125,6 +133,7 @@ export default function RegisterNewBook() {
       newErrors.quantidade = "*A quantidade deve ser maior que zero.";
     }
 
+
     if (!data.categoria) newErrors.categoria = "*Este é um campo obrigatório.";
 
     if (Object.keys(newErrors).length > 0) {
@@ -133,6 +142,7 @@ export default function RegisterNewBook() {
     }
 
     setErrors({});
+
 
     try {
       await createBook({
@@ -181,15 +191,21 @@ export default function RegisterNewBook() {
   const inputClass =
     "mt-1 block w-full rounded-md border border-slate-300 px-3 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#00C389] focus:outline-none focus:ring-1 focus:ring-[#00C389]";
 
+
   const labelClass = "text-sm font-medium text-slate-900";
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-[#F7F9FA]">
       <main className="mx-auto max-w-[896px] px-6 pb-10 pt-[32px]">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#F7F9FA]">
+      <main className="mx-auto max-w-[896px] px-6 pb-10 pt-[32px]">
         <header className="mb-[32px]">
+          <h2 className="text-xl font-semibold text-slate-800 md:text-2xl">
           <h2 className="text-xl font-semibold text-slate-800 md:text-2xl">
             Cadastrar Novo Livro
           </h2>
+
+          <p className="mt-2 text-sm text-slate-500 md:text-base">
 
           <p className="mt-2 text-sm text-slate-500 md:text-base">
             Adicione um novo livro ao acervo
@@ -200,12 +216,15 @@ export default function RegisterNewBook() {
           onSubmit={handleSubmit}
           noValidate
           className="flex flex-col gap-[16px] rounded-lg border border-slate-200 bg-white px-6 pb-8 pt-[32px] shadow-md"
+          className="flex flex-col gap-[16px] rounded-lg border border-slate-200 bg-white px-6 pb-8 pt-[32px] shadow-md"
         >
+          <div className="grid grid-cols-1 gap-[16px] md:grid-cols-2 md:gap-[32px]">
           <div className="grid grid-cols-1 gap-[16px] md:grid-cols-2 md:gap-[32px]">
             <div>
               <label htmlFor="titulo" className={labelClass}>
                 Título
               </label>
+
 
               <input
                 type="text"
@@ -219,12 +238,17 @@ export default function RegisterNewBook() {
               <p className="mt-1 min-h-[16px] text-xs text-red-500">
                 {errors.titulo}
               </p>
+
+              <p className="mt-1 min-h-[16px] text-xs text-red-500">
+                {errors.titulo}
+              </p>
             </div>
 
             <div>
               <label htmlFor="autor" className={labelClass}>
                 Autor
               </label>
+
 
               <input
                 type="text"
@@ -238,12 +262,18 @@ export default function RegisterNewBook() {
               <p className="mt-1 min-h-[16px] text-xs text-red-500">
                 {errors.autor}
               </p>
+              />
+
+              <p className="mt-1 min-h-[16px] text-xs text-red-500">
+                {errors.autor}
+              </p>
             </div>
 
             <div>
               <label htmlFor="isbn" className={labelClass}>
                 ISBN
               </label>
+
 
               <input
                 type="text"
@@ -257,12 +287,17 @@ export default function RegisterNewBook() {
               <p className="mt-1 min-h-[16px] text-xs text-red-500">
                 {errors.isbn}
               </p>
+
+              <p className="mt-1 min-h-[16px] text-xs text-red-500">
+                {errors.isbn}
+              </p>
             </div>
 
             <div>
               <label htmlFor="editora" className={labelClass}>
                 Editora
               </label>
+
 
               <input
                 type="text"
@@ -276,12 +311,17 @@ export default function RegisterNewBook() {
               <p className="mt-1 min-h-[16px] text-xs text-red-500">
                 {errors.editora}
               </p>
+
+              <p className="mt-1 min-h-[16px] text-xs text-red-500">
+                {errors.editora}
+              </p>
             </div>
 
             <div>
               <label htmlFor="ano" className={labelClass}>
                 Ano
               </label>
+
 
               <input
                 type="number"
@@ -295,12 +335,17 @@ export default function RegisterNewBook() {
               <p className="mt-1 min-h-[16px] text-xs text-red-500">
                 {errors.ano}
               </p>
+
+              <p className="mt-1 min-h-[16px] text-xs text-red-500">
+                {errors.ano}
+              </p>
             </div>
 
             <div>
               <label htmlFor="quantidade" className={labelClass}>
                 Quantidade
               </label>
+
 
               <input
                 type="number"
@@ -314,6 +359,10 @@ export default function RegisterNewBook() {
               <p className="mt-1 min-h-[16px] text-xs text-red-500">
                 {errors.quantidade}
               </p>
+
+              <p className="mt-1 min-h-[16px] text-xs text-red-500">
+                {errors.quantidade}
+              </p>
             </div>
           </div>
 
@@ -321,6 +370,7 @@ export default function RegisterNewBook() {
 
           <div>
             <p className={`${labelClass} mb-3`}>Categoria</p>
+
 
             <div className="flex w-full flex-wrap justify-center gap-4 xl:flex-nowrap xl:justify-between">
               {categorias.map((cat) => {
@@ -355,8 +405,13 @@ export default function RegisterNewBook() {
             <p className="mt-1 min-h-[16px] text-xs text-red-500">
               {errors.categoria}
             </p>
+
+            <p className="mt-1 min-h-[16px] text-xs text-red-500">
+              {errors.categoria}
+            </p>
           </div>
 
+          <div className="mt-4 flex flex-col gap-4 border-t border-slate-100 pt-6 md:flex-row md:justify-end">
           <div className="mt-4 flex flex-col gap-4 border-t border-slate-100 pt-6 md:flex-row md:justify-end">
             <Button
               type="button"
@@ -365,6 +420,7 @@ export default function RegisterNewBook() {
               className={`w-full md:w-fit ${secondaryActionButton}`}
               onClick={() => router.push("/livros")}
             />
+
 
             <Button
               type="submit"
