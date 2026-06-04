@@ -12,7 +12,11 @@ const statusMap: Record<string, "Em andamento" | "Devolvido" | "Atrasado"> = {
   Atrasado: "Atrasado",
 };
 
-const formatDate = (iso: string) => new Date(iso).toLocaleDateString("pt-BR");
+const formatDate = (iso: string) => {
+  const [date] = iso.split("T");
+  const [year, month, day] = date.split("-");
+  return `${day}/${month}/${year}`;
+};
 
 const allCategories = ["Romance", "Tecnologia", "História", "Ciências", "Infantil"];
 
