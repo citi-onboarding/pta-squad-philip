@@ -3,7 +3,7 @@ import prisma from "../database";
 export const DashboardRepository = {
   countActiveLoans: async (): Promise<number> => {
     return prisma.emprestimo.count({
-      where: { status: { in: ["Em_andamento", "Atrasado"] } },
+      where: { status: "Em_andamento" },
     });
   },
 
