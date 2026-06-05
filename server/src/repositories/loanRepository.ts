@@ -19,7 +19,10 @@ export const EmprestimoRepository = {
     });
   },
 
-  decreaseBookAvailability: async (livro_id: string, quantidade_disponivel: number): Promise<Livro> => {
+  decreaseBookAvailability: async (
+    livro_id: string,
+    quantidade_disponivel: number,
+  ): Promise<Livro> => {
     return prisma.livro.update({
       where: { id: livro_id },
       data: { quantidade_disponivel: quantidade_disponivel - 1 },
@@ -35,10 +38,9 @@ export const EmprestimoRepository = {
       throw new Error("Livro não encontrado.");
     }
 
-    // Garante que a quantidade disponível nunca ultrapasse a quantidade total
     const novaQuantidade = Math.min(
       livro.quantidade_disponivel + 1,
-      livro.quantidade_total
+      livro.quantidade_total,
     );
 
     return prisma.livro.update({
@@ -48,12 +50,22 @@ export const EmprestimoRepository = {
   },
 
   create: async (data: CreateLoanRepositoryData): Promise<Emprestimo> => {
+    const dataLocacao = new Date(data.data_locacao);
+    const agora = new Date();
+
+    dataLocacao.setHours(
+      agora.getHours(),
+      agora.getMinutes(),
+      agora.getSeconds(),
+      agora.getMilliseconds(),
+    );
+
     return prisma.emprestimo.create({
       data: {
         livro_id: data.livro_id,
         nome_cliente: data.nome_cliente,
         email_cliente: data.email_cliente,
-        data_locacao: data.data_locacao,
+        data_locacao: dataLocacao,
         data_prevista_devolucao: data.data_prevista_devolucao,
         status: "Em_andamento",
       },
@@ -95,8 +107,7 @@ export const EmprestimoRepository = {
     });
   },
 
-  returnBook: async (id: string, livro_id: string): Promise<LoanWithLivro> => {
-    // Busca o livro para garantir que não ultrapasse quantidade_total
+  returnBook: async (id: string, livro_id: string): Promise<Emprestimo> => {
     const livro = await prisma.livro.findUnique({
       where: { id: livro_id },
     });
@@ -107,7 +118,7 @@ export const EmprestimoRepository = {
 
     const novaQuantidade = Math.min(
       livro.quantidade_disponivel + 1,
-      livro.quantidade_total
+      livro.quantidade_total,
     );
 
     const [emprestimoAtualizado] = await prisma.$transaction([
@@ -119,7 +130,6 @@ export const EmprestimoRepository = {
         },
         include: { livro: true },
       }),
-
       prisma.livro.update({
         where: { id: livro_id },
         data: { quantidade_disponivel: novaQuantidade },

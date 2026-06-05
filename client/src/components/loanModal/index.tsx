@@ -291,8 +291,8 @@ export function LoanModal({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogOverlay className="bg-black/20 backdrop-blur-sm" />
 
-      <DialogContent className="flex max-h-[90dvh] max-w-[393px] flex-col overflow-hidden [&>button]:hidden">
-        <DialogHeader className="shrink-0">
+      <DialogContent className="flex max-h-[90dvh] w-[95vw] max-w-[460px] flex-col gap-0 overflow-hidden p-0 [&>button]:hidden">
+        <DialogHeader className="shrink-0 px-6 pt-6">
           <DialogTitle className="flex justify-between text-2xl">
             Realizar empréstimo
             <DialogClose className="rounded-lg p-2 hover:bg-[#f0f0f0] hover:duration-200">
@@ -303,11 +303,8 @@ export function LoanModal({
 
         <Separator className="shrink-0" />
 
-        <form
-          onSubmit={submitLoan}
-          className="flex min-h-0 flex-1 flex-col overflow-hidden"
-        >
-          <div className="flex-1 overflow-y-auto pr-1">
+        <form onSubmit={submitLoan} className="flex min-h-0 flex-1 flex-col">
+          <div className="flex-1 overflow-y-auto px-6 py-4">
             <div className="mb-4 flex flex-col items-start justify-center rounded-lg bg-[#F7F9FA] p-6">
               <p className="text-sm text-[#717182]">Livro selecionado:</p>
               <span className="text-md text-[#1E1E1E]">{bookTitle}</span>
@@ -316,7 +313,7 @@ export function LoanModal({
             <div className="flex flex-col gap-2">{formFields}</div>
           </div>
 
-          <div className="mt-4 shrink-0 border-t bg-white pt-4">
+          <div className="shrink-0 border-t bg-white px-6 py-4">
             <div className="flex w-full items-center justify-center gap-2">
               <Button
                 onClick={handleClose}
