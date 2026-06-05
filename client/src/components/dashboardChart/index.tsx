@@ -131,6 +131,16 @@ export default function DashboardChart({
       ? normalizedMostBorrowedBooks
       : normalizedLoansByCategory;
 
+  const truncateLabel = (value: string) => {
+    const maxLength = selectedChart === "most-borrowed-books" ? 24 : 26;
+
+    if (value.length <= maxLength) {
+      return value;
+    }
+
+    return `${value.slice(0, maxLength)}...`;
+  };
+
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-6">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -183,6 +193,8 @@ export default function DashboardChart({
             tickMargin={10}
             axisLine={false}
             fontSize={12}
+            interval={0}
+            tickFormatter={truncateLabel}
           />
 
           <YAxis tickLine={false} axisLine={false} fontSize={12} />

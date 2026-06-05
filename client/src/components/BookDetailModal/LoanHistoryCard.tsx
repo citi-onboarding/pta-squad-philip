@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "../bagde";
 import { Mail } from "lucide-react";
 import { useState, useEffect } from "react";
+import { primaryActionButton, secondaryActionButton } from "@/lib/animations";
 
 // Defines the props expected by the LoanHistoryCard component
 interface LoanHistoryCardProps {
@@ -121,6 +122,7 @@ export const LoanHistoryCard: React.FC<LoanHistoryCardProps> = ({
       >
         {canSendReminder && (
           <Button
+            className={secondaryActionButton}
             style={{
               ...styles.btnReminder,
               width: isMobile ? "100%" : "auto",
@@ -138,6 +140,7 @@ export const LoanHistoryCard: React.FC<LoanHistoryCardProps> = ({
 
         {canMarkAsReturned && (
           <Button
+            className={primaryActionButton}
             style={{
               ...styles.btnReturn,
               width: isMobile ? "100%" : "auto",
