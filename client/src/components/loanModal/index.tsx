@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { X } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,9 +23,7 @@ import {
 
 import { useIsMobile } from "../../hooks/useMobile";
 import { Input } from "../ui/input";
-import { X } from "lucide-react";
 import { Field, FieldLabel, FieldError } from "../ui/field";
-import { useState } from "react";
 import { Separator } from "../ui/separator";
 import { primaryActionButton, secondaryActionButton } from "@/lib/animations";
 
@@ -136,6 +137,7 @@ export function LoanModal({
       setErrors(newErrors);
       return;
     }
+
     await onConfirm({
       clientName: formData.clientName,
       clientEmail: formData.clientEmail,
@@ -155,117 +157,131 @@ export function LoanModal({
     onOpenChange(false);
   };
 
+  const formFields = (
+    <>
+      <Field>
+        <FieldLabel>Nome do Cliente</FieldLabel>
+        <Input
+          className="h-12"
+          type="text"
+          placeholder="Digite o nome do cliente"
+          value={formData.clientName}
+          onChange={(e) => {
+            setFormData({ ...formData, clientName: e.target.value });
+            validateField("clientName", e.target.value);
+          }}
+        />
+        <div className="min-h-[20px]">
+          <FieldError>{errors.clientName}</FieldError>
+        </div>
+      </Field>
+
+      <Field>
+        <FieldLabel>Email do Cliente</FieldLabel>
+        <Input
+          className="h-12"
+          type="text"
+          placeholder="Digite o email do cliente"
+          value={formData.clientEmail}
+          onChange={(e) => {
+            setFormData({ ...formData, clientEmail: e.target.value });
+            validateField("clientEmail", e.target.value);
+          }}
+        />
+        <div className="min-h-[20px]">
+          <FieldError>{errors.clientEmail}</FieldError>
+        </div>
+      </Field>
+
+      <Field>
+        <FieldLabel>Data da Locação</FieldLabel>
+        <Input
+          className="h-12 text-[#9CA3AF]"
+          type="date"
+          value={formData.loanDate}
+          onChange={(e) => {
+            setFormData({ ...formData, loanDate: e.target.value });
+            validateField("loanDate", e.target.value);
+          }}
+        />
+        <div className="min-h-[20px]">
+          <FieldError>{errors.loanDate}</FieldError>
+        </div>
+      </Field>
+
+      <Field>
+        <FieldLabel>Data da Devolução</FieldLabel>
+        <Input
+          className="h-12 text-[#9CA3AF]"
+          type="date"
+          value={formData.returnDate}
+          onChange={(e) => {
+            setFormData({ ...formData, returnDate: e.target.value });
+            validateField("returnDate", e.target.value);
+          }}
+        />
+        <div className="min-h-[20px]">
+          <FieldError>{errors.returnDate}</FieldError>
+        </div>
+      </Field>
+
+      {apiError && (
+        <div className="w-full rounded border border-red-400 bg-red-100 px-4 py-2 text-sm font-medium text-red-700">
+          {apiError}
+        </div>
+      )}
+    </>
+  );
+
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={handleClose}>
-        <DrawerContent>
-          <DrawerHeader className="flex justify-between items-center">
+        <DrawerContent className="flex max-h-[90dvh] flex-col overflow-hidden">
+          <DrawerHeader className="flex items-center justify-between">
             <DrawerTitle className="text-2xl">Realizar empréstimo</DrawerTitle>
+
             <DrawerClose
               onClick={handleClose}
-              className="p-2 hover:bg-[#f0f0f0] hover:duration-200 rounded-lg"
+              className="rounded-lg p-2 hover:bg-[#f0f0f0] hover:duration-200"
             >
-              <X className="w-5 h-5 text-[#717182]" />
+              <X className="h-5 w-5 text-[#717182]" />
             </DrawerClose>
           </DrawerHeader>
+
           <Separator />
-          <div className="px-4 flex flex-col gap-4 overflow-y-auto">
-            <div className="bg-[#F7F9FA] flex flex-col items-start justify-center p-6 rounded-lg mt-4">
-              <p className="text-[#717182] text-sm">Livro selecionado:</p>
-              <span className="text-[#1E1E1E] text-md">{bookTitle}</span>
+
+          <form
+            onSubmit={submitLoan}
+            className="flex min-h-0 flex-1 flex-col overflow-hidden"
+          >
+            <div className="flex-1 overflow-y-auto px-4 pb-4">
+              <div className="mt-4 flex flex-col items-start justify-center rounded-lg bg-[#F7F9FA] p-4">
+                <p className="text-sm text-[#717182]">Livro selecionado:</p>
+                <span className="text-md text-[#1E1E1E]">{bookTitle}</span>
+              </div>
+
+              <div className="mt-4 flex flex-col gap-2">{formFields}</div>
             </div>
 
-            <form onSubmit={submitLoan} className="flex flex-col gap-2">
-              <Field>
-                <FieldLabel>Nome do Cliente</FieldLabel>
-                <Input
-                  className="h-12"
-                  type="text"
-                  placeholder="Digite o nome do cliente"
-                  value={formData.clientName}
-                  onChange={(e) => {
-                    setFormData({ ...formData, clientName: e.target.value });
-                    validateField("clientName", e.target.value);
-                  }}
-                />
-                <div className="min-h-[20px]">
-                  <FieldError>{errors.clientName}</FieldError>
-                </div>
-              </Field>
-
-              <Field>
-                <FieldLabel>Email do Cliente</FieldLabel>
-                <Input
-                  className="h-12"
-                  type="text"
-                  placeholder="Digite o email do cliente"
-                  value={formData.clientEmail}
-                  onChange={(e) => {
-                    setFormData({ ...formData, clientEmail: e.target.value });
-                    validateField("clientEmail", e.target.value);
-                  }}
-                />
-                <div className="min-h-[20px]">
-                  <FieldError>{errors.clientEmail}</FieldError>
-                </div>
-              </Field>
-
-              <Field>
-                <FieldLabel>Data da Locação</FieldLabel>
-                <Input
-                  className="h-12 text-[#9CA3AF]"
-                  type="date"
-                  value={formData.loanDate}
-                  onChange={(e) => {
-                    setFormData({ ...formData, loanDate: e.target.value });
-                    validateField("loanDate", e.target.value);
-                  }}
-                />
-                <div className="min-h-[20px]">
-                  <FieldError>{errors.loanDate}</FieldError>
-                </div>
-              </Field>
-
-              <Field>
-                <FieldLabel>Data da Devolução</FieldLabel>
-                <Input
-                  className="h-12 text-[#9CA3AF]"
-                  type="date"
-                  value={formData.returnDate}
-                  onChange={(e) => {
-                    setFormData({ ...formData, returnDate: e.target.value });
-                    validateField("returnDate", e.target.value);
-                  }}
-                />
-                <div className="min-h-[20px]">
-                  <FieldError>{errors.returnDate}</FieldError>
-                </div>
-              </Field>
-
-              <Separator />
-              {apiError && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm font-medium w-full">
-                  {apiError}
-                </div>
-              )}
-              <div className="flex w-full justify-center items-center gap-2 pb-4"></div>
-              <div className="flex w-full justify-center items-center gap-2 pb-4">
+            <div className="border-t bg-white px-4 py-4">
+              <div className="flex w-full items-center justify-center gap-2">
                 <Button
                   onClick={handleClose}
                   type="button"
-                  className={`bg-white border border-solid border-[#00C389] rounded-lg text-[#00C389] text-lg ${secondaryActionButton}`}
+                  className={`rounded-lg border border-solid border-[#00C389] bg-white text-base text-[#00C389] ${secondaryActionButton}`}
                 >
                   Cancelar
                 </Button>
+
                 <Button
                   type="submit"
-                  className={`bg-[#00C389] border border-solid rounded-lg text-white text-lg  ${primaryActionButton}`}
+                  className={`rounded-lg border border-solid bg-[#00C389] text-base text-white ${primaryActionButton}`}
                 >
                   Confirmar Empréstimo
                 </Button>
               </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </DrawerContent>
       </Drawer>
     );
@@ -273,113 +289,50 @@ export function LoanModal({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogOverlay className="backdrop-blur-sm bg-black/20" />
-      <DialogContent className="max-w-[393px] [&>button]:hidden">
-        <DialogHeader className="flex justify-between">
-          <DialogTitle className="text-2xl flex justify-between">
+      <DialogOverlay className="bg-black/20 backdrop-blur-sm" />
+
+      <DialogContent className="flex max-h-[90dvh] max-w-[393px] flex-col overflow-hidden [&>button]:hidden">
+        <DialogHeader className="shrink-0">
+          <DialogTitle className="flex justify-between text-2xl">
             Realizar empréstimo
-            <DialogClose className="p-2 hover:bg-[#f0f0f0] hover:duration-200 rounded-lg">
-              <X className="w-5 h-5 text-[#717182]" />
+            <DialogClose className="rounded-lg p-2 hover:bg-[#f0f0f0] hover:duration-200">
+              <X className="h-5 w-5 text-[#717182]" />
             </DialogClose>
           </DialogTitle>
         </DialogHeader>
 
-        <Separator />
+        <Separator className="shrink-0" />
 
-        <div className="bg-[#F7F9FA] flex flex-col items-start justify-center p-6 rounded-lg mb-2">
-          <p className="text-[#717182] text-sm">Livro selecionado:</p>
-          <span className="text-[#1E1E1E] text-md">{bookTitle}</span>
-        </div>
-
-        <form onSubmit={submitLoan} className="flex flex-col gap-2">
-          <Field>
-            <FieldLabel>Nome do Cliente</FieldLabel>
-            <Input
-              className="h-12"
-              type="text"
-              placeholder="Digite o nome do cliente"
-              value={formData.clientName}
-              onChange={(e) => {
-                setFormData({ ...formData, clientName: e.target.value });
-                validateField("clientName", e.target.value);
-              }}
-            />
-            <div className="min-h-[20px]">
-              <FieldError>{errors.clientName}</FieldError>
+        <form
+          onSubmit={submitLoan}
+          className="flex min-h-0 flex-1 flex-col overflow-hidden"
+        >
+          <div className="flex-1 overflow-y-auto pr-1">
+            <div className="mb-4 flex flex-col items-start justify-center rounded-lg bg-[#F7F9FA] p-6">
+              <p className="text-sm text-[#717182]">Livro selecionado:</p>
+              <span className="text-md text-[#1E1E1E]">{bookTitle}</span>
             </div>
-          </Field>
 
-          <Field>
-            <FieldLabel>Email do Cliente</FieldLabel>
-            <Input
-              className="h-12"
-              type="text"
-              placeholder="Digite o email do cliente"
-              value={formData.clientEmail}
-              onChange={(e) => {
-                setFormData({ ...formData, clientEmail: e.target.value });
-                validateField("clientEmail", e.target.value);
-              }}
-            />
-            <div className="min-h-[20px]">
-              <FieldError>{errors.clientEmail}</FieldError>
+            <div className="flex flex-col gap-2">{formFields}</div>
+          </div>
+
+          <div className="mt-4 shrink-0 border-t bg-white pt-4">
+            <div className="flex w-full items-center justify-center gap-2">
+              <Button
+                onClick={handleClose}
+                type="button"
+                className={`border border-solid border-slate-200 bg-white text-black hover:border-[#00C389] hover:text-[#00C389] ${secondaryActionButton}`}
+              >
+                Cancelar
+              </Button>
+
+              <Button
+                type="submit"
+                className={`rounded-lg border border-solid bg-[#00C389] font-medium text-white hover:bg-[#00b07d] ${primaryActionButton}`}
+              >
+                Confirmar Empréstimo
+              </Button>
             </div>
-          </Field>
-
-          <Field>
-            <FieldLabel>Data da Locação</FieldLabel>
-            <Input
-              className="h-12 text-[#9CA3AF]"
-              type="date"
-              value={formData.loanDate}
-              onChange={(e) => {
-                setFormData({ ...formData, loanDate: e.target.value });
-                validateField("loanDate", e.target.value);
-              }}
-            />
-            <div className="min-h-[20px]">
-              <FieldError>{errors.loanDate}</FieldError>
-            </div>
-          </Field>
-
-          <Field>
-            <FieldLabel>Data da Devolução</FieldLabel>
-            <Input
-              className="h-12 text-[#9CA3AF]"
-              type="date"
-              value={formData.returnDate}
-              onChange={(e) => {
-                setFormData({ ...formData, returnDate: e.target.value });
-                validateField("returnDate", e.target.value);
-              }}
-            />
-            <div className="min-h-[20px]">
-              <FieldError>{errors.returnDate}</FieldError>
-            </div>
-          </Field>
-
-          <Separator />
-
-          {apiError && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm font-medium w-full">
-              {apiError}
-            </div>
-          )}
-
-          <div className="flex w-full justify-center items-center gap-2">
-            <Button
-              onClick={handleClose}
-              type="button"
-              className={`bg-white border border-solid border-slate-200 text-black hover:border-[#00C389] hover:text-[#00C389] ${secondaryActionButton}`}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              className={`bg-[#00C389] border border-solid rounded-lg text-white font-medium hover:bg-[#00b07d] ${primaryActionButton}`}
-            >
-              Confirmar Empréstimo
-            </Button>
           </div>
         </form>
       </DialogContent>

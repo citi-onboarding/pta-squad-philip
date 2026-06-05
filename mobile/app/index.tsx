@@ -77,6 +77,14 @@ function getLivroImagem(livro?: LivroApi) {
   return capasPorCategoria[normalizeText(categoria)];
 }
 
+function getTextoQuantidadeEmprestimos(quantidade: number) {
+  if (quantidade <= 1) {
+    return `${quantidade} Empréstimo encontrado`;
+  }
+
+  return `${quantidade} Empréstimos encontrados`;
+}
+
 function mapEmprestimoApiToEmprestimo(
   emprestimo: EmprestimoApi,
   livros: LivroApi[],
@@ -124,7 +132,13 @@ export default function Home() {
         ? livrosResponse.data
         : [];
 
-      const emprestimosFormatados = emprestimosData.map(
+      const emprestimosAtivos = emprestimosData.filter(
+        (emprestimo: EmprestimoApi) =>
+          emprestimo.status === "Em_andamento" ||
+          emprestimo.status === "Atrasado",
+      );
+
+      const emprestimosFormatados = emprestimosAtivos.map(
         (emprestimo: EmprestimoApi) =>
           mapEmprestimoApiToEmprestimo(emprestimo, livrosData),
       );
@@ -198,7 +212,7 @@ export default function Home() {
 
         {!erro && emprestimos.length > 0 ? (
           <Text style={styles.resultCounter}>
-            {emprestimos.length} empréstimo(s) encontrado(s)
+            {getTextoQuantidadeEmprestimos(emprestimos.length)}
           </Text>
         ) : null}
 
@@ -222,7 +236,9 @@ export default function Home() {
           )}
           ListEmptyComponent={
             !loading && !erro && buscaRealizada ? (
-              <Text style={styles.emptyText}>Nenhum empréstimo encontrado</Text>
+              <Text style={styles.emptyText}>
+                Nenhum empréstimo ativo encontrado
+              </Text>
             ) : null
           }
         />

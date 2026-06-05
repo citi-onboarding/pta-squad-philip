@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
@@ -87,6 +87,20 @@ export default function DashboardChart({
   const [selectedChart, setSelectedChart] =
     useState<ChartType>("books-by-category");
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    checkIsMobile();
+
+    window.addEventListener("resize", checkIsMobile);
+
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
+
   const selectedOption = chartOptions.find(
     (option) => option.value === selectedChart,
   );
@@ -132,7 +146,13 @@ export default function DashboardChart({
       : normalizedLoansByCategory;
 
   const truncateLabel = (value: string) => {
-    const maxLength = selectedChart === "most-borrowed-books" ? 24 : 26;
+    const maxLength = isMobile
+      ? selectedChart === "most-borrowed-books"
+        ? 12
+        : 10
+      : selectedChart === "most-borrowed-books"
+      ? 24
+      : 26;
 
     if (value.length <= maxLength) {
       return value;
@@ -142,7 +162,7 @@ export default function DashboardChart({
   };
 
   return (
-    <section className="rounded-xl border border-gray-200 bg-white p-6">
+    <section className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-base font-semibold text-gray-700">
           Estatísticas da Biblioteca
@@ -153,7 +173,7 @@ export default function DashboardChart({
           onChange={(event) =>
             setSelectedChart(event.target.value as ChartType)
           }
-          className="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 outline-none transition-all hover:border-slate-400 focus:border-[#00C389] focus:ring-2 focus:ring-[#00C389]/20"
+          className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 outline-none transition-all hover:border-slate-400 focus:border-[#00C389] focus:ring-2 focus:ring-[#00C389]/20 sm:w-auto"
         >
           {chartOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -165,15 +185,18 @@ export default function DashboardChart({
 
       <p className="mb-4 text-sm text-slate-500">{selectedOption?.label}</p>
 
-      <ChartContainer config={chartConfig} className="h-[300px] w-full">
+      <ChartContainer
+        config={chartConfig}
+        className="h-[360px] w-full sm:h-[300px]"
+      >
         <BarChart
           accessibilityLayer
           data={chartData}
           margin={{
             top: 20,
-            right: 20,
-            left: 20,
-            bottom: 20,
+            right: isMobile ? 8 : 20,
+            left: isMobile ? 0 : 20,
+            bottom: isMobile ? 70 : 20,
           }}
         >
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
@@ -190,14 +213,22 @@ export default function DashboardChart({
           <XAxis
             dataKey="name"
             tickLine={false}
-            tickMargin={10}
+            tickMargin={isMobile ? 16 : 10}
             axisLine={false}
-            fontSize={12}
+            fontSize={isMobile ? 11 : 12}
             interval={0}
+            angle={isMobile ? -35 : 0}
+            textAnchor={isMobile ? "end" : "middle"}
+            height={isMobile ? 80 : 30}
             tickFormatter={truncateLabel}
           />
 
-          <YAxis tickLine={false} axisLine={false} fontSize={12} />
+          <YAxis
+            tickLine={false}
+            axisLine={false}
+            fontSize={isMobile ? 11 : 12}
+            width={isMobile ? 28 : 40}
+          />
 
           <Bar
             dataKey="quantidade"
