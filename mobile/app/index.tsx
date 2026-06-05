@@ -77,6 +77,14 @@ function getLivroImagem(livro?: LivroApi) {
   return capasPorCategoria[normalizeText(categoria)];
 }
 
+function getTextoQuantidadeEmprestimos(quantidade: number) {
+  if (quantidade <= 1) {
+    return `${quantidade} Empréstimo encontrado`;
+  }
+
+  return `${quantidade} Empréstimos encontrados`;
+}
+
 function mapEmprestimoApiToEmprestimo(
   emprestimo: EmprestimoApi,
   livros: LivroApi[],
@@ -204,7 +212,7 @@ export default function Home() {
 
         {!erro && emprestimos.length > 0 ? (
           <Text style={styles.resultCounter}>
-            {emprestimos.length} empréstimo(s) ativo(s) encontrado(s)
+            {getTextoQuantidadeEmprestimos(emprestimos.length)}
           </Text>
         ) : null}
 
