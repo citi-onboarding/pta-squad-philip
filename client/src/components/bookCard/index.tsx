@@ -24,9 +24,11 @@ export function BookCard({
   onBorrow,
   onDelete,
 }: BookCardProps) {
+  const isOutOfStock = availableQuantity === 0;
+
   return (
-    <article className="flex min-h-[410px] w-full flex-col rounded-md border border-slate-200 bg-white p-4 shadow-md">
-      <div className="mb-4 aspect-[345/256] w-full overflow-hidden rounded bg-slate-100">
+    <article className="flex w-full max-w-[395px] flex-col rounded-md border border-slate-200 bg-white p-4 shadow-md">
+      <div className="mb-4 aspect-[1/1] w-full overflow-hidden rounded bg-slate-100">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -40,14 +42,16 @@ export function BookCard({
         )}
       </div>
 
-      <div className="mb-5">
-        <h3 className="mb-2 text-base font-semibold text-slate-900">{title}</h3>
+      <div className="mb-5 flex flex-col gap-2">
+        <h3 className="line-clamp-2 text-base font-semibold leading-snug text-slate-900">
+          {title}
+        </h3>
 
-        <p className="mb-2 text-sm text-slate-500">{author}</p>
+        <p className="text-sm text-slate-500">{author}</p>
 
-        <p className="mb-2 text-xs font-medium text-emerald-500">{category}</p>
+        <p className="text-xs font-semibold text-[#00C389]">{category}</p>
 
-        <p className="text-xs font-medium text-slate-800">
+        <p className="text-xs font-semibold text-slate-800">
           Disponível: {availableQuantity} unidade(s)
         </p>
       </div>
@@ -67,9 +71,13 @@ export function BookCard({
           icon={<Bookmark size={14} strokeWidth={2} />}
           iconPosition="left"
           onClick={onBorrow}
-          variantColor="bg-[#00C389] text-white hover:bg-[#00b07d]"
-          className="flex-1 text-sm disabled:bg-gray-300 disabled:text-gray-500 disabled:border-gray-300"
-          disabled={availableQuantity === 0}
+          disabled={isOutOfStock}
+          variantColor={
+            isOutOfStock
+              ? "bg-gray-300 text-gray-500 border-gray-300"
+              : "bg-[#00C389] text-white hover:bg-[#00b07d]"
+          }
+          className="flex-1 text-sm font-medium"
         />
 
         <Button
