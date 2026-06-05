@@ -254,7 +254,7 @@ export function LoanModal({
             onSubmit={submitLoan}
             className="flex min-h-0 flex-1 flex-col overflow-hidden"
           >
-            <div className="flex-1 overflow-y-auto px-4 pb-4">
+            <div className="no-scrollbar flex-1 overflow-y-auto px-4 pb-4">
               <div className="mt-4 flex flex-col items-start justify-center rounded-lg bg-[#F7F9FA] p-4">
                 <p className="text-sm text-[#717182]">Livro selecionado:</p>
                 <span className="text-md text-[#1E1E1E]">{bookTitle}</span>
@@ -304,7 +304,7 @@ export function LoanModal({
         <Separator className="shrink-0" />
 
         <form onSubmit={submitLoan} className="flex min-h-0 flex-1 flex-col">
-          <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div className="no-scrollbar flex-1 overflow-y-auto px-6 py-4">
             <div className="mb-4 flex flex-col items-start justify-center rounded-lg bg-[#F7F9FA] p-6">
               <p className="text-sm text-[#717182]">Livro selecionado:</p>
               <span className="text-md text-[#1E1E1E]">{bookTitle}</span>
