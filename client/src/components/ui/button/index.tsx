@@ -30,7 +30,7 @@ export function Button({
       disabled={disabled}
       className={cn(
         "flex items-center justify-center gap-2",
-        "px-4 py-2 rounded-md transition-colors",
+        "px-4 py-2 rounded-md transition-all duration-200 ease-in-out",
         variantColor,
         customSize,
         className,

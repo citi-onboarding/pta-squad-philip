@@ -1,7 +1,13 @@
 "use client";
 
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid } from "recharts";
-import { ChartContainer, ChartConfig } from "@/components/ui/chart";
+
+import {
+  ChartContainer,
+  ChartConfig,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 interface CategoryData {
   quantidade: number;
@@ -46,6 +52,20 @@ export default function CategoryChart({ data }: CategoryChartProps) {
           margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
         >
           <CartesianGrid vertical={false} stroke="#f0f0f0" />
+          <ChartTooltip
+            cursor={{ fill: "rgba(0, 0, 0, 0.04)" }}
+            content={
+              <ChartTooltipContent
+                labelFormatter={(label) => String(label)}
+                formatter={(value) => {
+                  const quantidade = Number(value);
+
+                  return [`Quantidade: ${quantidade}`];
+                }}
+              />
+            }
+          />
+
           <XAxis
             dataKey="categoria"
             tickLine={false}

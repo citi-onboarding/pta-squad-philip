@@ -3,7 +3,7 @@ import prisma from "../database";
 export const DashboardRepository = {
   countActiveLoans: async (): Promise<number> => {
     return prisma.emprestimo.count({
-      where: { status: { in: ["Em_andamento", "Atrasado"] } },
+      where: { status: "Em_andamento" },
     });
   },
 
@@ -31,6 +31,19 @@ export const DashboardRepository = {
   getTotalBooks: async () => {
     return prisma.livro.aggregate({
       _sum: { quantidade_total: true },
+    });
+  },
+
+  getLoansWithBooksForCharts: async () => {
+    return prisma.emprestimo.findMany({
+      select: {
+        livro: {
+          select: {
+            titulo: true,
+            categoria: true,
+          },
+        },
+      },
     });
   },
 };

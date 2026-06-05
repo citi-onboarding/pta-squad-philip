@@ -1,8 +1,8 @@
 import request from "supertest";
-import { app } from "../src/server";
-import prisma from "../src/database";
+import { app } from "../../src/server";
+import prisma from "../../src/database";
 
-jest.mock("src/services/email.services", () => ({
+jest.mock("src/services/emailServices", () => ({
   enviarLembrete: jest.fn().mockResolvedValue(undefined),
   enviarConfirmacaoDevolucao: jest.fn().mockResolvedValue(undefined),
 }));
