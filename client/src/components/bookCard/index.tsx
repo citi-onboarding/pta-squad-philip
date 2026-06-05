@@ -2,6 +2,12 @@
 
 import { Eye, Bookmark, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  primaryActionButton,
+  secondaryActionButton,
+  destructiveActionButton,
+  interactiveCard,
+} from "@/lib/animations";
 
 interface BookCardProps {
   title: string;
@@ -27,7 +33,9 @@ export function BookCard({
   const isOutOfStock = availableQuantity === 0;
 
   return (
-    <article className="flex w-full max-w-[395px] flex-col rounded-md border border-slate-200 bg-white p-4 shadow-md">
+    <article
+      className={`flex w-full max-w-[395px] flex-col rounded-md border border-slate-200 bg-white p-4 shadow-md ${interactiveCard}`}
+    >
       <div className="mb-4 aspect-[1/1] w-full overflow-hidden rounded bg-slate-100">
         {imageUrl ? (
           <img
@@ -63,7 +71,7 @@ export function BookCard({
           iconPosition="left"
           onClick={onView}
           variantColor="border border-[#00C389] text-[#00C389] hover:bg-[#00C389]/10"
-          className="flex-1 text-sm font-medium"
+          className={`flex-1 text-sm font-medium ${secondaryActionButton}`}
         />
 
         <Button
@@ -77,7 +85,7 @@ export function BookCard({
               ? "bg-gray-300 text-gray-500 border-gray-300"
               : "bg-[#00C389] text-white hover:bg-[#00b07d]"
           }
-          className="flex-1 text-sm font-medium"
+          className={`flex-1 text-sm disabled:hover:scale-100 disabled:hover:shadow-none ${primaryActionButton}`}
         />
 
         <Button
@@ -86,6 +94,7 @@ export function BookCard({
           aria-label="Excluir livro"
           variantColor="bg-red-500 text-white hover:bg-red-600"
           customSize="w-11"
+          className={destructiveActionButton}
         />
       </div>
     </article>

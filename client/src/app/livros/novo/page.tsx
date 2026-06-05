@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button";
 import type { FormEvent, ChangeEvent } from "react";
 import { createBook } from "@/services/books.service";
 import { categoryImageMap } from "@/lib/categoryMap";
+import {
+  primaryActionButton,
+  secondaryActionButton,
+  interactiveCard,
+} from "@/lib/animations";
 
 export interface FormDataProps {
   titulo: string;
@@ -185,7 +190,6 @@ export default function RegisterNewBook() {
           <h2 className="text-xl font-semibold text-slate-800 md:text-2xl">
             Cadastrar Novo Livro
           </h2>
-
           <p className="mt-2 text-sm text-slate-500 md:text-base">
             Adicione um novo livro ao acervo
           </p>
@@ -333,7 +337,9 @@ export default function RegisterNewBook() {
                       onChange={handleChange}
                     />
 
-                    <div className="relative h-[174.86px] w-[146.88px] overflow-hidden rounded-[8px] border-[1.67px] border-slate-200 bg-white transition-all hover:border-slate-300 peer-checked:border-[#00C389] peer-checked:ring-2 peer-checked:ring-[#00C389]/20">
+                    <div
+                      className={`relative h-[174.86px] w-[146.88px] overflow-hidden rounded-[8px] border-[1.67px] border-slate-200 bg-white transition-all hover:border-slate-300 peer-checked:border-[#00C389] peer-checked:ring-2 peer-checked:ring-[#00C389]/20 ${interactiveCard}`}
+                    >
                       <img
                         src={categoryImageMap[categoryKey]}
                         alt={cat}
@@ -355,7 +361,7 @@ export default function RegisterNewBook() {
               type="button"
               text="Cancelar"
               variantColor="bg-transparent text-[#00C389] border border-[#00C389]"
-              className="w-full md:w-fit"
+              className={`w-full md:w-fit ${secondaryActionButton}`}
               onClick={() => router.push("/livros")}
             />
 
@@ -363,7 +369,7 @@ export default function RegisterNewBook() {
               type="submit"
               text="Salvar Livro"
               variantColor="bg-[#00C389] text-white hover:bg-[#00b07d]"
-              className="w-full md:w-fit"
+              className={`w-full md:w-fit ${primaryActionButton}`}
             />
           </div>
         </form>

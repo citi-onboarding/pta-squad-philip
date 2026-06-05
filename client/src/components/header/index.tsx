@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Home, BookOpen, Plus, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoCiti from "@/assets/icons/logoCiti_semfundo 1.png";
+import { primaryActionButton, headerNavButton } from "@/lib/animations";
 
 export function Header() {
   const pathname = usePathname();
@@ -40,7 +41,7 @@ export function Header() {
                   : "bg-transparent text-gray-800 hover:bg-gray-50"
               }
               customSize="w-fit h-[40px]"
-              className="whitespace-nowrap text-sm md:text-base"
+              className={`whitespace-nowrap text-sm md:text-base ${headerNavButton}`}
             />
           </Link>
 
@@ -55,7 +56,7 @@ export function Header() {
                   : "bg-transparent text-gray-800 hover:bg-gray-50"
               }
               customSize="w-fit h-[40px]"
-              className="whitespace-nowrap text-sm md:text-base"
+              className={`whitespace-nowrap text-sm md:text-base ${headerNavButton}`}
             />
           </Link>
 
@@ -66,7 +67,7 @@ export function Header() {
               iconPosition="left"
               variantColor="bg-[#00C389] text-white"
               customSize="w-fit h-[40px]"
-              className="whitespace-nowrap text-sm md:text-base"
+              className={`whitespace-nowrap text-sm md:text-base ${primaryActionButton}`}
             />
           </Link>
         </div>
@@ -89,6 +90,7 @@ export function Header() {
                       : "bg-transparent text-gray-800 hover:bg-gray-50"
                   }
                   customSize="w-full h-[40px]"
+                  className={headerNavButton}
                 />
               </Link>
 
@@ -103,6 +105,7 @@ export function Header() {
                       : "bg-transparent text-gray-800 hover:bg-gray-50"
                   }
                   customSize="w-full h-[40px]"
+                  className={headerNavButton}
                 />
               </Link>
 
@@ -114,11 +117,9 @@ export function Header() {
                   iconPosition="left"
                   variantColor="bg-[#00C389] text-white"
                   customSize="w-full h-[40px]"
-                  onClick={() => {
-                    console.log("Funcionando!");
-                  }}
+                  className={primaryActionButton}
                 />
-                </Link>
+              </Link>
             </div>
           )}
         </div>
