@@ -124,7 +124,13 @@ export default function Home() {
         ? livrosResponse.data
         : [];
 
-      const emprestimosFormatados = emprestimosData.map(
+      const emprestimosAtivos = emprestimosData.filter(
+        (emprestimo: EmprestimoApi) =>
+          emprestimo.status === "Em_andamento" ||
+          emprestimo.status === "Atrasado",
+      );
+
+      const emprestimosFormatados = emprestimosAtivos.map(
         (emprestimo: EmprestimoApi) =>
           mapEmprestimoApiToEmprestimo(emprestimo, livrosData),
       );
@@ -198,7 +204,7 @@ export default function Home() {
 
         {!erro && emprestimos.length > 0 ? (
           <Text style={styles.resultCounter}>
-            {emprestimos.length} empréstimo(s) encontrado(s)
+            {emprestimos.length} empréstimo(s) ativo(s) encontrado(s)
           </Text>
         ) : null}
 
@@ -222,7 +228,9 @@ export default function Home() {
           )}
           ListEmptyComponent={
             !loading && !erro && buscaRealizada ? (
-              <Text style={styles.emptyText}>Nenhum empréstimo encontrado</Text>
+              <Text style={styles.emptyText}>
+                Nenhum empréstimo ativo encontrado
+              </Text>
             ) : null
           }
         />
